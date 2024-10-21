@@ -1,0 +1,1 @@
+export const restaurantId: string = "84171f52-e650-4ee7-b8c0-73d0fe6af329";

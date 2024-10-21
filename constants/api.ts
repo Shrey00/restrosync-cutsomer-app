@@ -1,0 +1,1 @@
+export const api: string = "http://192.168.31.128:4000";
