@@ -5,8 +5,10 @@ import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useTheme } from "@rneui/themed";
 import BottomTab from "@/components/BottomTab";
+import useUserStore from "@/store/userStore";
 export default function TabLayout() {
   const { theme } = useTheme();
+  const { token } = useUserStore((state) => state.user);
   return (
     <Tabs tabBar={BottomTab}>
       <Tabs.Screen
@@ -30,13 +32,7 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
-      <Tabs.Screen
-        name="menu"
-        options={{
-          title: "Menu",
-          headerShown: false,
-        }}
-      />
+      
       <Tabs.Screen
         name="cart"
         options={{

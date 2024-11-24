@@ -7,7 +7,6 @@ import { User } from "@/types";
 //   ifSelectedAddButtonRedirectToLogin: () => {},
 //   updateUserDetailsMaybeAddress: () => {},
 // }));
-
 interface UserState {
   user: User;
   setUser: (userObj: User) => void;

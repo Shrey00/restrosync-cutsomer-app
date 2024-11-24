@@ -26,7 +26,7 @@ export default function profile() {
       marginHorizontal: 10,
       marginTop: 0,
       marginBottom: 10,
-      paddingHorizontal:20,
+      paddingHorizontal: 20,
     },
     skeletonContainer: {
       flexDirection: "column",
@@ -58,7 +58,7 @@ export default function profile() {
       paddingHorizontal: 0,
       backgroundColor: theme.colors.white,
       borderBottomWidth: 1,
-      borderColor: "#EDEDED"
+      borderColor: "#EDEDED",
     },
   });
 
@@ -134,7 +134,9 @@ export default function profile() {
               <ListItem.Title>Privacy Policy</ListItem.Title>
             </ListItem.Content>
           </ListItem>
-          <ListItem containerStyle={{...styles.listItem, borderBottomWidth:0}}>
+          <ListItem
+            containerStyle={{ ...styles.listItem, borderBottomWidth: 0 }}
+          >
             <Feather name="log-out" size={24} color={theme.colors.primary} />
             <ListItem.Content>
               <ListItem.Title>Logout</ListItem.Title>

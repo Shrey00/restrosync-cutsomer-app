@@ -2,17 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Platform, View, ScrollView, StyleSheet } from "react-native";
 import { Card } from "@rneui/themed";
 import Header from "@/components/Header";
-import { Text, Button } from "@rneui/themed";
+import { Text, Button, Skeleton } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
-import useUserStore from "../../store/userStore";
-import useCartStore from "../../store/cartStore";
+
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
+import ChangeAddressModal from "@/components/ChangeAddressModal";
+import AddAddressModal from "@/components/AddAddressModal";
+import useUserStore from "../../store/userStore";
+import useCartStore from "../../store/cartStore";
+import useAddressStore from "@/store/addressStore";
+import useOrderStore from "@/store/orderStore";
 import { CartItem } from "@/types";
+import { Link } from "expo-router";
+import useModalStore from "@/store/modalsStore";
+import { AddressType } from "../../types";
+import { useRouter, Redirect } from "expo-router";
+import { restaurantId } from "@/constants/restaurantInfo";
 export default function CartsPage() {
   const { theme } = useTheme();
   const modTheme = {
@@ -45,11 +56,8 @@ export default function CartsPage() {
       flex: 1,
     },
     listItemContainer: {
-      // borderWidth: 1,
-      // borderColor: "#EF9A9A",
       padding: 12,
       marginHorizontal: 10,
-      // marginTop: 20,
       borderRadius: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
@@ -117,127 +125,297 @@ export default function CartsPage() {
     paymentButtonContainer: {
       flexDirection: "row",
       alignItems: "center",
+      gap: 8,
       paddingHorizontal: 10,
+    },
+    skeletonContainer: {
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 6,
+    },
+    skeletonStructure: {
+      backgroundColor: "#FFFFF",
+      borderRadius: 8,
+      marginVertical: 10,
+    },
+    skeleton: {
+      backgroundColor: "#EDEDED",
     },
   });
 
-  const user = useUserStore((state) => state.user);
+  const paymentMethod = [
+    {
+      id: 1,
+      name: "Pay on Delivery",
+      icon: (
+        <MaterialIcons
+          style={{ marginRight: 4 }}
+          name="delivery-dining"
+          size={24}
+          color={theme.colors.primary}
+        />
+      ),
+    },
+  ];
+  const user: any = useUserStore((state) => state.user);
+  const router = useRouter();
   const cartItems = useCartStore((state) => state.cart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
   const getTotalSavings = useCartStore((state) => state.getTotalSavings);
   const setCartItem = useCartStore((state) => state.setCartItem);
+  const setChangeAddressModalOpen = useModalStore(
+    (state) => state.setChangeAddressModalOpen
+  );
+  const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
+  const setAddress = useAddressStore((state) => state.setAddress);
+  const allAddresses = useAddressStore((state) => state.allAddresses);
+  const address = useAddressStore((state) => state.address);
+  const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
+  const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
+  const boolAddressSelected = (address.id ? address.id.length : 0) > 0;
+  const boolHasSavedAddresses = allAddresses.length > 0;
+  const [cartItemsLoading, setCartItemsLoading] = useState(false);
+  const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
+
+  if (!(user.token.length> 0)) {
+    return <Redirect href={'/login'} />;
+  }
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${api}/get-cart-items`, {
+        setCartItemsLoading(true);
+        const response = await fetch(`${api}/cart/get-cart-items`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${user.token}`,
-            "x-platform": Platform.OS,
           },
         });
         const responseData = await response.json();
-        console.log(responseData);
         setCartItem(responseData.data);
+        setCartItemsLoading(false);
       } catch (e) {
         console.log(e);
       }
     })();
   }, []);
+  useEffect(() => {
+    (async () => {
+      const addressResponse = await fetch(`${api}/address/get-addresses`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const addressResponseData = await addressResponse.json();
+      let selectedAddressDetail: AddressType;
+      await addressResponseData.data.forEach(
+        (item: AddressType, index: number) => {
+          if (item.selected) {
+            setAddress(item);
+            selectedAddressDetail = item;
+            setOrderButtonDisabled(false);
+            setAllAddresses(addressResponseData.data);
+            setNewOrderDetails({ address: selectedAddressDetail.id });
+          }
+        }
+      );
+    })();
+  }, [cartItemsLoading]);
+  const handleOrder = async () => {
+    if (boolAddressSelected) {
+      const orderItems = cartItems.map((item, index) => {
+        return {
+          quantity: item.quantity,
+          menuId: item.menuItemId,
+          addNote: "",
+        };
+      });
+      setNewOrderDetails({ orderItems });
+      const response = await fetch(`${api}/orders/place-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(newOrderDetails),
+      });
+      const responseData = await response.json();
+    } else {
+      setChangeAddressModalOpen(true);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <Header user={user} showSearch={false} />
-      <ScrollView style={styles.scrollView}>
-        <View
-          style={{
-            paddingHorizontal: 14,
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 5,
-          }}
-        >
-          <Text>🤗</Text>
-          <Text
-            style={{
-              fontFamily: "jakarta-sans-medium",
-              fontSize: 13.8,
-            }}
-          >
-            Hii Pankaj!, you have some items in your cart.
-          </Text>
-        </View>
-        <Card containerStyle={styles.listItemContainer}>
-          {cartItems.map((item) => (
-            <CartListItem
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              cuisineType={item.cuisineType}
-              quantity={item.quantity}
-              sellingPrice={item.sellingPrice}
-              markedPrice={item.markedPrice}
-              discount={item.discount}
-            />
-          ))}
-        </Card>
-
-        <Card containerStyle={styles.listItemContainer}>
-          <View style={styles.couponsContainer}>
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <MaterialCommunityIcons
-                name="brightness-percent"
-                size={19}
+      {!cartItemsLoading ? (
+        cartItems.length > 0 ? (
+          <>
+            <ScrollView style={styles.scrollView}>
+              <View
+                style={{
+                  paddingHorizontal: 14,
+                  marginTop: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 5,
+                }}
+              >
+                <Text>🤗</Text>
+                <Text
+                  style={{
+                    fontFamily: "jakarta-sans-medium",
+                    fontSize: 13.8,
+                  }}
+                >
+                  Hii {user.firstName}!, you have some items in your cart.
+                </Text>
+              </View>
+              <Card containerStyle={styles.listItemContainer}>
+                {cartItems.map((item, index) => (
+                  <CartListItem
+                    key={index}
+                    menuItemId={item.menuItemId}
+                    id={item.id}
+                    name={item.name}
+                    cuisineType={item.cuisineType}
+                    quantity={item.quantity}
+                    sellingPrice={item.sellingPrice}
+                    markedPrice={item.markedPrice}
+                    discount={item.discount}
+                    restaurantId={item.restaurantId}
+                  />
+                ))}
+                {cartItems.length === 0 && <View></View>}
+              </Card>
+              {/* coupons button */}
+              {/* <Card containerStyle={styles.listItemContainer}>
+            <View style={styles.couponsContainer}>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <MaterialCommunityIcons
+                  name="brightness-percent"
+                  size={19}
+                  color={theme.colors.primary}
+                />
+                <Text style={styles.viewCouponText}>View all coupons</Text>
+              </View>
+              <Entypo
+                name="chevron-thin-right"
+                size={20}
                 color={theme.colors.primary}
               />
-              <Text style={styles.viewCouponText}>View all coupons</Text>
             </View>
-            <Entypo
-              name="chevron-thin-right"
-              size={20}
-              color={theme.colors.primary}
-            />
-          </View>
-        </Card>
-        <DeliveryInfoCard />
-        <Card
-          containerStyle={{ ...styles.listItemContainer, marginBottom: 8 }}
-        >
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Total Savings</Text>
-            <Text style={styles.savingsAmount}>
-              ₹{getTotalSavings()?.toFixed(2)}
+          </Card> */}
+              <DeliveryInfoCard
+                boolAddressSelected={boolAddressSelected}
+                boolHasSavedAddresses={boolHasSavedAddresses}
+              />
+              <Card
+                containerStyle={{
+                  ...styles.listItemContainer,
+                  marginBottom: 8,
+                }}
+              >
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryText}>Total Savings</Text>
+                  <Text style={styles.savingsAmount}>
+                    ₹{getTotalSavings()?.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryText}>Delivery Charges</Text>
+                  <Text style={styles.totalAmount}>₹{25}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryText}>Total Amount</Text>
+                  <Text style={styles.totalAmount}>
+                    ₹{(getTotalAmount() + 20 + 25)?.toFixed(2)}{" "}
+                  </Text>
+                </View>
+              </Card>
+            </ScrollView>
+            <View style={styles.paymentButtonContainer}>
+              <Button
+                title={paymentMethod[0].name}
+                icon={paymentMethod[0].icon}
+                titleStyle={{
+                  color: theme.colors.primary,
+                  ...styles.checkoutButtonTitle,
+                }}
+                containerStyle={styles.checkoutButtonContainer}
+                buttonStyle={{
+                  paddingVertical: 12,
+                  borderWidth: 0.8,
+                  borderColor: theme.colors.primary,
+                  backgroundColor: "transparent",
+                }}
+              />
+              <Button
+                title="Place Order"
+                titleStyle={styles.checkoutButtonTitle}
+                buttonStyle={{ width: "87.2%", ...styles.checkoutButton }}
+                containerStyle={styles.checkoutButtonContainer}
+                disabled={orderButtonDisabled}
+                onPress={handleOrder}
+              />
+            </View>
+          </>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
+              No items in your cart!{" "}
+              <Link
+                style={{
+                  color: theme.colors.primary,
+                  textDecorationLine: "underline",
+                  textDecorationStyle: "solid",
+                }}
+                href="/"
+              >
+                Let's add some
+              </Link>
             </Text>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Taxes</Text>
-            <Text style={styles.totalAmount}>₹{20}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Delivery Charges</Text>
-            <Text style={styles.totalAmount}>₹{25}</Text>
-          </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryText}>Total Amount</Text>
-            <Text style={styles.totalAmount}>
-              ₹{(getTotalAmount() + 20 + 25)?.toFixed(2)}{" "}
-            </Text>
-          </View>
-        </Card>
-      </ScrollView>
-      <View style={styles.paymentButtonContainer}>
-        <Button
-          title="Place Order"
-          titleStyle={styles.checkoutButtonTitle}
-          buttonStyle={styles.checkoutButton}
-          containerStyle={styles.checkoutButtonContainer}
-          onPress={() => {}}
-        />
-      </View>
+        )
+      ) : (
+        <ScrollView contentContainerStyle={{ marginHorizontal: 10 }}>
+          <Skeleton
+            animation="pulse"
+            height={45}
+            style={styles.skeletonStructure}
+            skeletonStyle={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={200}
+            style={styles.skeletonStructure}
+            skeletonStyle={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={200}
+            style={styles.skeletonStructure}
+            skeletonStyle={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={140}
+            style={styles.skeletonStructure}
+            skeletonStyle={styles.skeleton}
+          />
+        </ScrollView>
+      )}
+      <ChangeAddressModal />
     </SafeAreaView>
   );
 }

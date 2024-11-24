@@ -7,14 +7,22 @@ import Entypo from "@expo/vector-icons/Entypo";
 import SearchBar from "./Search";
 import { User } from "@/types";
 import { router } from "expo-router";
+import { MAP_API_KEY } from "@/constants/api";
 import * as Location from "expo-location";
-
+import useLocationStore from "@/store/locationStore";
+import useModalStore from "@/store/modalsStore";
+import AddAddressModal from "./AddAddressModal";
+import ItemOptionsOverlay from "./ItemOptionsOverlay";
 const Header = ({
   user,
   showSearch,
+  setSearchText,
+  searchText,
 }: {
   user: User | null;
   showSearch: boolean;
+  setSearchText?: any;
+  searchText?: string;
 }) => {
   const { theme } = useTheme();
   const styles = StyleSheet.create({
@@ -30,7 +38,7 @@ const Header = ({
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      paddingBottom:8
+      paddingBottom: 8,
     },
     locationIconContainer: {
       borderRadius: 46,
@@ -62,77 +70,149 @@ const Header = ({
       backgroundColor: theme.colors.primary,
     },
   });
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const location = useLocationStore((state) => state.location);
+  const setLocation = useLocationStore((state) => state.setLocation);
+  const locationText = useLocationStore((state) => state.locationText);
+  const setLocationText = useLocationStore((state) => state.setLocationText);
+  const [locationAccessDenied, setLocationAccessDenied] = useState<'waiting' | 'done'>('waiting');
 
+  const setAddAddressModalOpen = useModalStore(
+    (state) => state.setAddAddressModalOpen
+  );
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
+      let location: any;
       if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
+        setLocationAccessDenied("done");
         return;
+      } else {
+        location = await Location.getCurrentPositionAsync({});
+        setLocationAccessDenied("done");
       }
-      let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-      console.log(location.coords);
+      const response = await fetch(
+        `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${location.coords.latitude},${location.coords.longitude}&api_key=${MAP_API_KEY}`
+      );
+      const responseData = await response.json();
+      let requiredLocationData = {
+        formattedAddress: "",
+        areaName: "",
+        subLocality: "",
+        neighbourhood: "",
+        city: "",
+        country: "",
+        state: "",
+        postalCode: "",
+      };
+      requiredLocationData.formattedAddress =
+        responseData?.results[0].formatted_address;
+      requiredLocationData.areaName = responseData?.results[0].name;
+      responseData?.results[0].address_components.forEach(
+        (item: any, index: number) => {
+          if (item.types) {
+            for (let i = 0; i < item.types.length; ++i) {
+              if (item.types[i] === "country")
+                requiredLocationData.country = item.short_name;
+              if (item.types[i] === "administrative_area_level_1")
+                requiredLocationData.state = item.short_name;
+              if (item.types[i] === "administrative_area_level_2")
+                requiredLocationData.city = item.short_name;
+              if (item.types[i] === "locality")
+                requiredLocationData.areaName = item.short_name;
+              if (item.types[i] === "sublocality")
+                requiredLocationData.subLocality = item.short_name;
+              if (item.types[i] === "neighborhood")
+                requiredLocationData.neighbourhood = item.short_name;
+              if (item.types[i] === "postal_code")
+                requiredLocationData.postalCode = item.short_name;
+            }
+          }
+        }
+      );
+      setLocationText(requiredLocationData);
     })();
   }, []);
 
   let text = "Waiting..";
-  if (errorMsg) {
-    text = errorMsg;
+  if (locationAccessDenied) {
+    text = locationAccessDenied;
   } else if (location) {
     text = JSON.stringify(location);
   }
 
-  function handleLocationSetting() {}
+  function handleLocationSetting() {
+    setAddAddressModalOpen(true);
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Pressable onPress={handleLocationSetting}>
-          <View style={styles.locationContainer}>
-            <View style={styles.locationIconContainer}>
-              <MaterialIcons
-                name="location-pin"
-                size={28}
-                style={styles.locationIcon}
+    <>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Pressable onPress={handleLocationSetting}>
+            <View style={styles.locationContainer}>
+              <View style={styles.locationIconContainer}>
+                <MaterialIcons
+                  name="location-pin"
+                  size={28}
+                  style={styles.locationIcon}
+                />
+              </View>
+
+              <View style={{ minWidth: "60%", maxWidth: "68%" }}>
+                {locationText.city.length > 0 || locationAccessDenied==='done' ? (
+                  <>
+                    <Text style={styles.locationText} numberOfLines={1}>
+                      {locationText.subLocality ? 
+                        locationText.subLocality : "----"+ ","}
+                      {locationText.neighbourhood ? 
+                      locationText.neighbourhood : "----" + ","}
+                      {locationText.areaName && locationText.areaName + ","}
+                    </Text>
+                    <Text style={styles.locationTextCity}>
+                      {locationText.state ? locationText.state : "--"}, {locationText.country ? locationText.country: "--"}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.locationText} numberOfLines={1}>
+                      Loading...
+                    </Text>
+                    <Text style={styles.locationTextCity}>Loading...</Text>
+                  </>
+                )}
+              </View>
+              <Entypo
+                name="chevron-thin-right"
+                size={24}
+                style={styles.locationRightIcon}
               />
             </View>
-            <View>
-              <Text style={styles.locationText}>Flat no.23,Shankar Nagar</Text>
-              <Text style={styles.locationTextCity}>Raipur</Text>
-            </View>
-            <Entypo
-              name="chevron-thin-right"
-              size={24}
-              style={styles.locationRightIcon}
-            />
-          </View>
-        </Pressable>
+          </Pressable>
 
-        <View style={styles.rightContainer}>
-          {user ? (
-            <Avatar
-              rounded
-              size={42}
-              title={user.firstName.charAt(0).toUpperCase()}
-              containerStyle={styles.avatar}
-            />
-          ) : (
-            <Button
-              title="Login"
-              onPress={() => {
-                router.replace("/login");
-              }}
-            />
-          )}
+          <View style={styles.rightContainer}>
+            {user?.token ? (
+              <Avatar
+                rounded
+                size={42}
+                title={user.firstName.charAt(0).toUpperCase()}
+                containerStyle={styles.avatar}
+              />
+            ) : (
+              <Button
+                title="Login"
+                onPress={() => {
+                  router.replace("/login");
+                }}
+              />
+            )}
+          </View>
         </View>
+        {showSearch && (
+          <SearchBar searchText={searchText} setSearchText={setSearchText} />
+        )}
       </View>
-      {showSearch && <SearchBar />}
-    </View>
+    </>
   );
 };
 

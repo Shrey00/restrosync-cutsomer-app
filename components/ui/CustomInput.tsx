@@ -39,11 +39,11 @@ const styles = StyleSheet.create({
     margin: 0,
     backgroundColor: '#fff',
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.02,
     shadowRadius: 4,
-    elevation: 5, // For Android
+    elevation: 4, 
   },
   input: {
     fontSize: 14,

@@ -1,59 +1,66 @@
 import React from "react";
-import { View, Text, StyleSheet, Linking, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Image } from "@rneui/themed";
-
+import { Href, useRouter } from "expo-router";
+import useMenuStore from "@/store/menuStore";
 interface DataItem {
   name: string;
   image: string;
   link: string;
 }
 const Categories = () => {
+  const router = useRouter();
   const data: DataItem[] = [
     {
       name: "Pizza",
-      image: "https://example.com/pizza.jpg",
-      link: "https://example.com/pizza",
+      image:
+        "https://www.vegrecipesofindia.com/wp-content/uploads/2020/11/pizza-recipe.jpg",
+      link: "/menu?name=All&search=pizza",
     },
     {
       name: "Burger",
-      image: "https://example.com/burger.jpg",
-      link: "https://example.com/burger",
+      image:
+        "https://www.noracooks.com/wp-content/uploads/2023/04/veggie-burgers-1-2.jpg",
+      link: "/menu?name=All&search=burger",
+    },
+    {
+      name: "Sandwiches",
+      image:
+        "https://www.maggi.ph/sites/default/files/srh_recipes/91afe3a3615aaa162847dc3fdcdda2da.jpg",
+      link: "/menu?name=All&search=sandwich",
     },
     {
       name: "Pasta",
-      image: "https://example.com/pasta.jpg",
-      link: "https://example.com/pasta",
+      image:
+        "https://www.foodiecrush.com/easy-homemade-marinara-sauce/penne-marinara-sauce-foodiecrush-com-004/",
+      link: "/menu?name=All&search=pasta",
     },
     {
-      name: "Salad",
-      image: "https://example.com/salad.jpg",
-      link: "https://example.com/salad",
+      name: "Fries",
+      image:
+        "https://www.recipetineats.com/tachyon/2022/09/Fries-with-rosemary-salt_1.jpg",
+      link: "/menu?name=All&search=fries",
     },
     {
-      name: "Salad",
-      image: "https://example.com/salad.jpg",
-      link: "https://example.com/salad",
+      name: "Shakes",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN4S8wWC1GZJDXq1Ex4K-v7gCmH7ieNfaMhg&s",
+      link: "/menu?name=All&search=shakes",
     },
     {
-      name: "Salad",
-      image: "https://example.com/salad.jpg",
-      link: "https://example.com/salad",
+      name: "Breads",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUPAqshPnXk3Kb-P2U4T-NZ3x2NcQ510IfXA&s",
+      link: "/menu?name=All&search=breads",
     },
   ];
-
-  const handlePress = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      console.error("Failed to open URL:", err)
-    );
-  };
-  const heading = "Popular Categories"
+  const heading = "Popular Categories";
+  const removeFilter = useMenuStore((state) => state.removeFilter);
+  const addFilter = useMenuStore((state) => state.addFilter);
   return (
     <View>
       <View style={styles.categoriesListContainerHeadingContainer}>
         <Text style={styles.categoriesListContainerHeading}>{heading}</Text>
-        {/* <Link href={link.link}>
-          <Text style={styles.link}>{link.text}</Text>
-        </Link> */}
       </View>
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
@@ -62,14 +69,19 @@ const Categories = () => {
       >
         <View style={styles.categoriesContainer}>
           {data.map((item, index) => (
-            <View key={index} style={styles.imageContainer}>
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-                onPress={() => handlePress(item.link)}
-              />
-              <Text style={styles.text}>{item.name}</Text>
-            </View>
+            <Pressable
+              key={index}
+              onPress={() => {
+                removeFilter({ filter: "search", value: "any" as string });
+                addFilter([{ filter: "search", value: item.name }]);
+                router.push(item.link as Href);
+              }}
+            >
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: item.image }} style={styles.image} />
+                <Text style={styles.text}>{item.name}</Text>
+              </View>
+            </Pressable>
           ))}
         </View>
       </ScrollView>
@@ -86,7 +98,7 @@ const styles = StyleSheet.create({
   },
   categoriesListContainerHeading: {
     fontSize: 16,
-    fontFamily:"jakarta-sans-semibold"
+    fontFamily: "jakarta-sans-semibold",
   },
   container: {
     paddingBottom: 16,

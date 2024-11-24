@@ -1,34 +1,40 @@
-import React, { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 import { Input } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useTheme } from "@rneui/themed";
-const SearchBar = () => {
-  const [searchText, setSearchText] = useState("");
+import { useRouter, useSegments } from "expo-router";
+import { api } from "../constants/api";
+import useMenuStore from "@/store/menuStore";
+const SearchBar = ({
+  setSearchText,
+  searchText,
+}: {
+  setSearchText?: any;
+  searchText?: string;
+}) => {
   const { theme } = useTheme();
+
   const styles = StyleSheet.create({
     inputOuterContainer: {
       width: "100%",
       margin: 0,
-      paddingHorizontal:0,
+      paddingHorizontal: 0,
       paddingBottom: 16,
-      paddingTop: 8
+      paddingTop: 8,
     },
     inputInnerContainer: {
       borderBottomWidth: 0,
-      borderColor: "#EF9A9A",
       paddingHorizontal: 8,
-      // borderRadius: 4,
-      margin:0,
+      margin: 0,
       backgroundColor: "#fff",
-      // padding: 10,
       borderRadius: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.02,
       shadowRadius: 4,
-      elevation: 5, // For Android
+      elevation: 4, // For Android
     },
     input: {
       fontSize: 14,
@@ -44,9 +50,26 @@ const SearchBar = () => {
     },
   });
 
+  const inputRef = useRef(null);
+  const segments = useSegments(); // Detects route changes
+  useEffect(() => {
+    if (segments[1] === "search" && inputRef.current) {
+      inputRef.current?.focus();
+    } 
+  }, [segments]);
+
+  // useEffect(() => {
+  
+  // }, [shouldFocus]);
+
+  const router = useRouter();
+  const handleSearchBarFocus = () => {
+    router.replace("/search");
+  };
   return (
     <View style={{ margin: 0 }}>
       <Input
+        ref={inputRef}
         placeholder="Search..."
         value={searchText}
         onChangeText={setSearchText}
@@ -61,6 +84,7 @@ const SearchBar = () => {
         inputContainerStyle={styles.inputInnerContainer}
         inputStyle={styles.input}
         errorStyle={styles.inputErrorStyle}
+        onPress={handleSearchBarFocus}
       />
     </View>
   );

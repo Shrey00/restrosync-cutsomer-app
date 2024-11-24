@@ -17,42 +17,49 @@ export interface User {
   loyaltyPoints?: number;
   createdAt?: Date;
   updatedAt?: Date;
-  token?: string;
+  token: string;
 }
 
 export interface Menu {
-  id: string;
-  name: string;
-  restaurantId: string;
+  categoryId: string;
   category: string;
-  type: string;
-  cuisineType: string;
-  orders: number;
-  description: string;
-  rating: number;
-  reviewSummary: string;
-  markedPrice: number;
-  sellingPrice: number;
-  discount: number;
-  calories: number;
-  healthScore: number;
-  showHealthInfo: boolean;
-  variant: "add-ons" | "parent" | "child" | "none";
-  images: string[];
+  items: {
+    id: string;
+    name: string;
+    restaurantId: string;
+    category: string;
+    type: string;
+    cuisineType: string;
+    orders: number;
+    description: string;
+    rating: number;
+    reviewSummary: string;
+    markedPrice: number;
+    sellingPrice: number;
+    discount: number;
+    calories: number;
+    healthScore: number;
+    showHealthInfo: boolean;
+    variant: "add-ons" | "parent" | "child" | "none";
+    images: string[];
+  }[];
 }
 
 export type CartItem = {
   id: string;
   name: string;
-  images: string[];
-  quantity: number;
+  menuItemId: string;
+  restaurantId: string;
+  markedPrice: number;
   sellingPrice: number;
   cuisineType: string;
-  markedPrice: number;
   discount: number;
+  quantity: number;
 };
 export interface CartItemProps {
   id: string;
+  menuItemId: string,
+  restaurantId: string;
   name: string;
   cuisineType: string;
   sellingPrice: number;
@@ -73,6 +80,7 @@ export interface FoodItemProps {
   cuisineType: string;
   key?: number;
   user?: any;
+  restaurantId: string;
   variant: string;
   setCartModalVisible?: any;
   setMenuItemData?: any;
@@ -86,4 +94,30 @@ export interface VariantsData {
   sellingPrice: number;
   markedPrice: number;
   discount: number;
+}
+
+export interface AddressType {
+  id?: string;
+  address_line_1: string;
+  address_line_2?: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  type: string;
+  location?: { x?: number; y?: number };
+  selected: boolean;
+}
+
+export interface RestaurantType {
+  id: string;
+  name: string;
+  rating: 0;
+  logo: string;
+  opensAt: string;
+  closesAt: string;
+  cuisineType: "multi-cuisine" | "veg" | "non-veg";
+  acceptingOrders: true;
+  nextOpeningTime: string; //only to be used for temporary opening and closing of restaurants
+  nextClosingTime: string;
 }

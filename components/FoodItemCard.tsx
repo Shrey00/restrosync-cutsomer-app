@@ -9,7 +9,8 @@ import { api } from "@/constants/api";
 import { restaurantId } from "@/constants/restaurantInfo";
 import useCartStore from "@/store/cartStore";
 import { FoodItemProps } from "@/types";
-
+import useModalStore from "@/store/modalsStore";
+import { useRouter } from "expo-router";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
 const IMAGE_WIDTH = CARD_WIDTH * 0.4;
@@ -26,13 +27,18 @@ export default function FoodItemCard({
   description,
   variant,
   user,
-  setCartModalVisible,
   setMenuItemData,
 }: FoodItemProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [cartButtonText, setcartButtonText] = useState("Add");
+  const router = useRouter();
+  const cartItems = useCartStore((state)=>state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
+  const setHoverCartInfo = useCartStore((state)=>state.setCartHoverInfo);
+  const setCartModalIsOpen = useModalStore(
+    (state) => state.setAddToCartModalOpen
+  );
   const handleScroll = (event: any) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -41,16 +47,10 @@ export default function FoodItemCard({
 
   async function handleAddToCart() {
     if (cartButtonText !== "Add") return;
-    const cartItemParams = {
-      name,
-      id,
-      sellingPrice,
-      images,
-      quantity: 1,
-      cuisineType,
-      markedPrice,
-      discount,
-    };
+    if (!(user.token.length > 0)) {
+      router.push("/login");
+      return;
+    }
     if (variant === "parent") {
       setMenuItemData({
         id,
@@ -63,22 +63,37 @@ export default function FoodItemCard({
         description,
         variant,
       });
-      setCartModalVisible(true);
+      setCartModalIsOpen(true);
     } else {
       try {
         setAddToCartLoading(true);
-        addToCart(cartItemParams);
-        const response = await fetch(`${api}/add-to-cart`, {
+        const response = await fetch(`${api}/cart/add-to-cart`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
-          body: JSON.stringify({ userId: user.id, itemId: id, restaurantId }),
+          body: JSON.stringify({
+            menuItemId: id,
+          }),
         });
+        const responseData = await response.json();
+        console.log(responseData)
+        const cartItemParams = {
+          id: responseData[0].id,
+          name:name,
+          menuItemId: responseData[0].menuItemId,
+          restaurantId,
+          markedPrice,
+          sellingPrice: responseData[0].finalPrice,
+          cuisineType,
+          discount,
+          quantity: responseData[0].quantity,
+        };
+        addToCart(cartItemParams);
+        setHoverCartInfo(cartItemParams, ++cartItems.length)
         setcartButtonText("Added 🎉");
         setAddToCartLoading(false);
-        const data = await response.json();
       } catch (e) {
         console.log(e);
       }
@@ -102,6 +117,7 @@ export default function FoodItemCard({
               ratingCount={5.0}
               fractions={1}
               imageSize={16}
+              startingValue={rating}
               readonly={true}
               showReadOnlyText={false}
               ratingBackgroundColor="#E8D6AE"
@@ -124,7 +140,9 @@ export default function FoodItemCard({
             {images?.map((image, index) => (
               <Image
                 key={index}
-                source={{ uri: image }}
+                source={{
+                  uri: image,
+                }}
                 style={styles.image}
                 PlaceholderContent={<Text>Loading...</Text>}
               />

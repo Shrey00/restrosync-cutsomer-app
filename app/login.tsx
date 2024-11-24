@@ -10,11 +10,12 @@ import React, { useState } from "react";
 import { Input, Button } from "@rneui/themed";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
+import Entypo from "@expo/vector-icons/Entypo";
+import Feather from "@expo/vector-icons/Feather";
 import useUserStore from "../store/userStore";
 import { save, updateToken } from "@/utils";
 import { router } from "expo-router";
-import {api} from '../constants/api';
+import { api } from "../constants/api";
 const LoginScreen = () => {
   const { theme } = useTheme();
   const [useOtp, setUseOtp] = useState(false);
@@ -40,17 +41,16 @@ const LoginScreen = () => {
         });
         const responseData = await response.json();
         const userData = responseData.data[0];
-        console.log("WOW",userData)
         save("token", userData.token);
         save("refreshToken", userData.refreshToken);
         setUser(userData);
         setIsLoading(false);
+        router.push("/(tabs)");
       } catch (e) {
         console.log(e);
       }
     }
   };
-
   return (
     <View style={styles.container}>
       {!useOtp ? (
@@ -58,25 +58,20 @@ const LoginScreen = () => {
           <CustomInput
             placeholder="Enter Email"
             value={email}
+            style={{ paddingVertical: 8 }}
             onChangeText={setEmail}
-            leftIcon={
-              <AntDesign name="user" size={24} color={theme.colors.primary} />
-            }
           />
           <CustomInput
             placeholder="Enter Password"
             value={password}
+            style={{ paddingVertical: 8 }}
+            secureTextEntry={true}
             onChangeText={setPassword}
-            leftIcon={
-              <MaterialIcons
-                name="password"
-                size={24}
-                color={theme.colors.primary}
-              />
-            }
+            textContentType="password"
           />
           <Button
             title="Login"
+            loading={isLoading}
             onPress={handleLogin}
             buttonStyle={styles.button}
             titleStyle={styles.buttonText}
@@ -113,6 +108,7 @@ const LoginScreen = () => {
         type="clear"
         onPress={() => setUseOtp(!useOtp)}
         titleStyle={styles.switchText}
+        containerStyle={{ borderRadius: 4 }}
       />
     </View>
   );
@@ -126,7 +122,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 16,
-    paddingVertical: 14,
+    paddingVertical: 10,
   },
   otpText: {
     fontSize: 16,
@@ -176,8 +172,28 @@ export default function login() {
         flex: 1,
       }}
     >
-      <Pressable onPress={()=>{router.replace("/")}}>
-        <MaterialIcons name="chevron-left" size={24} color={theme.colors.primary} />
+      <Pressable
+        style={{ marginLeft: 12, flexDirection: "row", alignItems: "center" }}
+        onPress={() => {
+          router.replace("/");
+        }}
+      >
+        <Entypo
+          name="chevron-thin-left"
+          size={20}
+          color={theme.colors.primary}
+        />
+        <Text
+          style={{
+            fontFamily: "jakarta-sans-medium",
+            fontSize: 16,
+            color: theme.colors.primary,
+            marginBottom: 4,
+            marginLeft:2
+          }}
+        >
+          Home
+        </Text>
       </Pressable>
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Welcome</Text>

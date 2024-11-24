@@ -1,12 +1,15 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { useTheme } from "@rneui/themed";
 import React from "react";
 import { ListItem, Text, Button, Icon, Divider } from "@rneui/themed";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useCartStore from "@/store/cartStore";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import { CartItemProps } from "@/types/index";
+import useUserStore from "@/store/userStore";
+import { api } from "@/constants/api";
 const CartListItem = ({
   id,
   name,
@@ -29,10 +32,11 @@ const CartListItem = ({
       error: "#F44336",
     },
   };
+  const { token } = useUserStore((state) => state.user);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
   const styles = StyleSheet.create({
     listItem: {
-      // marginBottom: 2,
       backgroundColor: "transparent",
       borderBottomWidth: 0,
       borderRadius: 8,
@@ -57,7 +61,6 @@ const CartListItem = ({
       alignItems: "center",
       justifyContent: "space-between",
       width: 82,
-      // borderWidth: 1,
       borderColor: theme.colors.primary,
       backgroundColor: theme.colors.secondary,
       borderRadius: 4,
@@ -100,7 +103,38 @@ const CartListItem = ({
       backgroundColor: theme.colors.secondary,
       borderRadius: 4,
     },
+    buttonsContainer: {
+      flexDirection: "row",
+      gap: 14,
+      alignItems: "center",
+    },
   });
+
+  const handleUpdateQuantity = async (id: string, quanity: number) => {
+    if (quantity < 1) return;
+    const response = await fetch(`${api}/cart/update-quantity`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ itemId: id, quantity }),
+    });
+    if (response.status === 200) updateQuantity(id, quantity);
+  };
+  const handleDeleteCartItem = async (id: string) => {
+    const response = await fetch(`${api}/cart/delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ itemId: id }),
+    });
+    if (response.status === 200) {
+      removeFromCart(id);
+    }
+  };
   return (
     <ListItem key={id} bottomDivider containerStyle={styles.listItem}>
       <ListItem.Content style={styles.cartItemContainer}>
@@ -115,39 +149,48 @@ const CartListItem = ({
             {name}
           </ListItem.Title>
           <View style={styles.priceContainer}>
-            <Text style={styles.finalPrice}>₹{sellingPrice.toFixed(2)}</Text>
             <Text style={styles.markedPrice}>₹{markedPrice.toFixed(2)}</Text>
+            <Text style={styles.finalPrice}>₹{sellingPrice.toFixed(2)}</Text>
             <Text style={styles.discount}>
-              Save ₹{(markedPrice * discount) / 100}
+              Save ₹{(markedPrice - sellingPrice)}
             </Text>
           </View>
         </View>
-        <View style={styles.quantityContainer}>
-          <Button
-            icon={
-              <FontAwesome6
-                name="minus"
-                size={12}
-                color={theme.colors.primary}
-              />
-            }
-            onPress={() => {
-              updateQuantity(id, --quantity);
-            }}
-            buttonStyle={styles.quantityButtonMinus}
-          />
-          <Text style={styles.quantityText}>{quantity}</Text>
-          <Button
-            icon={
-              <FontAwesome6
-                name="plus"
-                size={12}
-                color={theme.colors.primary}
-              />
-            }
-            onPress={() => updateQuantity(id, ++quantity)}
-            buttonStyle={styles.quantityButtonPlus}
-          />
+        <View style={styles.buttonsContainer}>
+          <View style={styles.quantityContainer}>
+            <Button
+              icon={
+                <FontAwesome6
+                  name="minus"
+                  size={12}
+                  color={theme.colors.primary}
+                />
+              }
+              onPress={() => {
+                handleUpdateQuantity(id, --quantity);
+              }}
+              buttonStyle={styles.quantityButtonMinus}
+            />
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <Button
+              icon={
+                <FontAwesome6
+                  name="plus"
+                  size={12}
+                  color={theme.colors.primary}
+                />
+              }
+              onPress={() => handleUpdateQuantity(id, ++quantity)}
+              buttonStyle={styles.quantityButtonPlus}
+            />
+          </View>
+          <Pressable onPress={()=>handleDeleteCartItem(id)}>
+            <FontAwesome6
+              name="trash-alt"
+              size={16}
+              color={theme.colors.primary}
+            />
+          </Pressable>
         </View>
       </ListItem.Content>
     </ListItem>

@@ -54,7 +54,6 @@ const BottomTab: React.FC<BottomTabBarProps> = ({
           });
 
           if (!isFocused && !event.defaultPrevented) {
-            console.log(route.name, route.params)
             navigation.navigate(route.name, route.params);
           }
         };

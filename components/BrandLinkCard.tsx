@@ -5,12 +5,16 @@ import { useState } from "react";
 import { ActivityIndicator, Animated } from "react-native";
 import { Button } from "@rneui/themed";
 
-const OfferLinkCard = ({
+const BrandLinkCard = ({
   imageSource,
   title,
+  showOffer,
+  offerText,
 }: {
   imageSource: { uri: string };
   title: string;
+  showOffer: boolean;
+  offerText: string;
 }) => {
   const styles = StyleSheet.create({
     cardContainer: {
@@ -18,7 +22,7 @@ const OfferLinkCard = ({
       padding: 0,
       margin: 0,
       width: 160,
-      minHeight: 195,
+      minHeight: 140,
       overflow: "hidden",
     },
     image: {
@@ -26,7 +30,7 @@ const OfferLinkCard = ({
       height: 120,
     },
     textContainer: {
-      padding: 15,
+      padding: 10,
       justifyContent: "center",
       alignItems: "center",
     },
@@ -38,6 +42,16 @@ const OfferLinkCard = ({
       fontSize: 14,
       textAlign: "center",
     },
+    offerInfoText: {
+      fontFamily: "jakarta-sans-medium",
+      fontSize: 11,
+      color: "#066D07",
+      textAlign: "center",
+    },
+    offerInfo: {
+      backgroundColor: "#E1FFE9",
+      padding: 4,
+    },
   });
   return (
     <Card containerStyle={styles.cardContainer}>
@@ -45,8 +59,13 @@ const OfferLinkCard = ({
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
       </View>
+      {showOffer && (
+        <View style={styles.offerInfo}>
+          <Text style={styles.offerInfoText}>{offerText}</Text>
+        </View>
+      )}
     </Card>
   );
 };
 
-export default OfferLinkCard;
+export default BrandLinkCard;
