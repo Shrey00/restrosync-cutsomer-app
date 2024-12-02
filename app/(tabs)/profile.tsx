@@ -15,11 +15,11 @@ import useMenuStore from "../../store/menuStore";
 import useUserStore from "../../store/userStore";
 import { FoodItemProps } from "@/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
-
+import {useRouter} from "expo-router";
 export default function profile() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
-
+  const router = useRouter();
   const styles = StyleSheet.create({
     cardContainer: {
       borderRadius: 8,
@@ -61,7 +61,7 @@ export default function profile() {
       borderColor: "#EDEDED",
     },
   });
-
+  router.push("/order-status")
   const { token } = useUserStore((state) => state.user);
 
   return (

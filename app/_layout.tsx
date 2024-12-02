@@ -138,6 +138,7 @@ export default function RootLayout() {
         <Stack.Screen name="offers" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="menu" options={{ headerShown: false }} />
+        <Stack.Screen name="order-status" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

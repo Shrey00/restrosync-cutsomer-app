@@ -6,6 +6,7 @@ import { Text, Button, Skeleton } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import OrderSuccessMessage from "@/components/OrderSuccessMessage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
@@ -26,6 +27,7 @@ import { useRouter, Redirect } from "expo-router";
 import { restaurantId } from "@/constants/restaurantInfo";
 export default function CartsPage() {
   const { theme } = useTheme();
+  const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
   const modTheme = {
     colors: {
       primary: theme.colors.primary,
@@ -179,8 +181,8 @@ export default function CartsPage() {
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
 
-  if (!(user.token.length> 0)) {
-    return <Redirect href={'/login'} />;
+  if (!(user.token.length > 0)) {
+    return <Redirect href={"/login"} />;
   }
   useEffect(() => {
     (async () => {
@@ -192,6 +194,7 @@ export default function CartsPage() {
             Authorization: `Bearer ${user.token}`,
           },
         });
+
         const responseData = await response.json();
         setCartItem(responseData.data);
         setCartItemsLoading(false);
@@ -224,73 +227,90 @@ export default function CartsPage() {
   }, [cartItemsLoading]);
   const handleOrder = async () => {
     if (boolAddressSelected) {
-      const orderItems = cartItems.map((item, index) => {
-        return {
-          quantity: item.quantity,
-          menuId: item.menuItemId,
-          addNote: "",
-        };
-      });
-      setNewOrderDetails({ orderItems });
-      const response = await fetch(`${api}/orders/place-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify(newOrderDetails),
-      });
-      const responseData = await response.json();
+      try {
+        setLoadingPlaceOrder(true);
+        const orderItems = cartItems.map((item, index) => {
+          return {
+            quantity: item.quantity,
+            menuId: item.menuItemId,
+            addNote: "",
+          };
+        });
+        setNewOrderDetails({ orderItems });
+        const response = await fetch(`${api}/orders/place-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify(newOrderDetails),
+        });
+        const responseData = await response.json();
+        if (responseData) {
+          setOrderSuccessVisible(true);
+          setTimeout(() => {
+            setOrderSuccessVisible(false);
+            // router.push("/orders/order-status")
+          }, 1500);
+        }
+        setLoadingPlaceOrder(false);
+      } catch (e) {
+        console.log(e);
+      }
     } else {
       setChangeAddressModalOpen(true);
     }
   };
-
+  const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
-      <Header user={user} showSearch={false} />
-      {!cartItemsLoading ? (
-        cartItems.length > 0 ? (
-          <>
-            <ScrollView style={styles.scrollView}>
-              <View
-                style={{
-                  paddingHorizontal: 14,
-                  marginTop: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
-                <Text>🤗</Text>
-                <Text
-                  style={{
-                    fontFamily: "jakarta-sans-medium",
-                    fontSize: 13.8,
-                  }}
-                >
-                  Hii {user.firstName}!, you have some items in your cart.
-                </Text>
-              </View>
-              <Card containerStyle={styles.listItemContainer}>
-                {cartItems.map((item, index) => (
-                  <CartListItem
-                    key={index}
-                    menuItemId={item.menuItemId}
-                    id={item.id}
-                    name={item.name}
-                    cuisineType={item.cuisineType}
-                    quantity={item.quantity}
-                    sellingPrice={item.sellingPrice}
-                    markedPrice={item.markedPrice}
-                    discount={item.discount}
-                    restaurantId={item.restaurantId}
-                  />
-                ))}
-                {cartItems.length === 0 && <View></View>}
-              </Card>
-              {/* coupons button */}
-              {/* <Card containerStyle={styles.listItemContainer}>
+      {orderSuccessVisible ? (
+        <OrderSuccessMessage />
+      ) : (
+        <>
+          <Header user={user} showSearch={false} />
+          {!cartItemsLoading ? (
+            cartItems.length > 0 ? (
+              <>
+                <ScrollView style={styles.scrollView}>
+                  <View
+                    style={{
+                      paddingHorizontal: 14,
+                      marginTop: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <Text>🤗</Text>
+                    <Text
+                      style={{
+                        fontFamily: "jakarta-sans-medium",
+                        fontSize: 13.8,
+                      }}
+                    >
+                      Hii {user.firstName}!, you have some items in your cart.
+                    </Text>
+                  </View>
+                  <Card containerStyle={styles.listItemContainer}>
+                    {cartItems.map((item, index) => (
+                      <CartListItem
+                        key={index}
+                        menuItemId={item.menuItemId}
+                        id={item.id}
+                        name={item.name}
+                        cuisineType={item.cuisineType}
+                        quantity={item.quantity}
+                        sellingPrice={item.sellingPrice}
+                        markedPrice={item.markedPrice}
+                        discount={item.discount}
+                        restaurantId={item.restaurantId}
+                      />
+                    ))}
+                    {cartItems.length === 0 && <View></View>}
+                  </Card>
+                  {/* coupons button */}
+                  {/* <Card containerStyle={styles.listItemContainer}>
             <View style={styles.couponsContainer}>
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
@@ -309,112 +329,118 @@ export default function CartsPage() {
               />
             </View>
           </Card> */}
-              <DeliveryInfoCard
-                boolAddressSelected={boolAddressSelected}
-                boolHasSavedAddresses={boolHasSavedAddresses}
-              />
-              <Card
-                containerStyle={{
-                  ...styles.listItemContainer,
-                  marginBottom: 8,
-                }}
-              >
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryText}>Total Savings</Text>
-                  <Text style={styles.savingsAmount}>
-                    ₹{getTotalSavings()?.toFixed(2)}
-                  </Text>
+                  <DeliveryInfoCard
+                    boolAddressSelected={boolAddressSelected}
+                    boolHasSavedAddresses={boolHasSavedAddresses}
+                  />
+                  <Card
+                    containerStyle={{
+                      ...styles.listItemContainer,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <View style={styles.summaryRow}>
+                      <Text style={styles.summaryText}>Total Savings</Text>
+                      <Text style={styles.savingsAmount}>
+                        ₹{getTotalSavings()?.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                      <Text style={styles.summaryText}>Delivery Charges</Text>
+                      <Text style={styles.totalAmount}>₹{25}</Text>
+                    </View>
+                    <View style={styles.summaryRow}>
+                      <Text style={styles.summaryText}>Total Amount</Text>
+                      <Text style={styles.totalAmount}>
+                        ₹{(getTotalAmount() + 20 + 25)?.toFixed(2)}{" "}
+                      </Text>
+                    </View>
+                  </Card>
+                </ScrollView>
+                <View style={styles.paymentButtonContainer}>
+                  <Button
+                    title={paymentMethod[0].name}
+                    icon={paymentMethod[0].icon}
+                    titleStyle={{
+                      color: theme.colors.primary,
+                      ...styles.checkoutButtonTitle,
+                    }}
+                    containerStyle={styles.checkoutButtonContainer}
+                    buttonStyle={{
+                      paddingVertical: 12,
+                      borderWidth: 0.8,
+                      borderColor: theme.colors.primary,
+                      backgroundColor: "transparent",
+                    }}
+                  />
+                  <Button
+                    title="Place Order"
+                    titleStyle={styles.checkoutButtonTitle}
+                    loading={loadingPlaceOrder}
+                    buttonStyle={{ width: "87.2%", ...styles.checkoutButton }}
+                    containerStyle={styles.checkoutButtonContainer}
+                    disabled={orderButtonDisabled}
+                    onPress={handleOrder}
+                  />
                 </View>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryText}>Delivery Charges</Text>
-                  <Text style={styles.totalAmount}>₹{25}</Text>
-                </View>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryText}>Total Amount</Text>
-                  <Text style={styles.totalAmount}>
-                    ₹{(getTotalAmount() + 20 + 25)?.toFixed(2)}{" "}
-                  </Text>
-                </View>
-              </Card>
-            </ScrollView>
-            <View style={styles.paymentButtonContainer}>
-              <Button
-                title={paymentMethod[0].name}
-                icon={paymentMethod[0].icon}
-                titleStyle={{
-                  color: theme.colors.primary,
-                  ...styles.checkoutButtonTitle,
-                }}
-                containerStyle={styles.checkoutButtonContainer}
-                buttonStyle={{
-                  paddingVertical: 12,
-                  borderWidth: 0.8,
-                  borderColor: theme.colors.primary,
-                  backgroundColor: "transparent",
-                }}
-              />
-              <Button
-                title="Place Order"
-                titleStyle={styles.checkoutButtonTitle}
-                buttonStyle={{ width: "87.2%", ...styles.checkoutButton }}
-                containerStyle={styles.checkoutButtonContainer}
-                disabled={orderButtonDisabled}
-                onPress={handleOrder}
-              />
-            </View>
-          </>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
-              No items in your cart!{" "}
-              <Link
+              </>
+            ) : (
+              <View
                 style={{
-                  color: theme.colors.primary,
-                  textDecorationLine: "underline",
-                  textDecorationStyle: "solid",
+                  flex: 1,
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-                href="/"
               >
-                Let's add some
-              </Link>
-            </Text>
-          </View>
-        )
-      ) : (
-        <ScrollView contentContainerStyle={{ marginHorizontal: 10 }}>
-          <Skeleton
-            animation="pulse"
-            height={45}
-            style={styles.skeletonStructure}
-            skeletonStyle={styles.skeleton}
-          />
-          <Skeleton
-            animation="pulse"
-            height={200}
-            style={styles.skeletonStructure}
-            skeletonStyle={styles.skeleton}
-          />
-          <Skeleton
-            animation="pulse"
-            height={200}
-            style={styles.skeletonStructure}
-            skeletonStyle={styles.skeleton}
-          />
-          <Skeleton
-            animation="pulse"
-            height={140}
-            style={styles.skeletonStructure}
-            skeletonStyle={styles.skeleton}
-          />
-        </ScrollView>
+                <Text
+                  style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}
+                >
+                  No items in your cart!{" "}
+                  <Link
+                    style={{
+                      color: theme.colors.primary,
+                      textDecorationLine: "underline",
+                      textDecorationStyle: "solid",
+                    }}
+                    href="/"
+                  >
+                    Let's add some
+                  </Link>
+                </Text>
+              </View>
+            )
+          ) : (
+            <ScrollView contentContainerStyle={{ marginHorizontal: 10 }}>
+              <Skeleton
+                animation="pulse"
+                height={45}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={200}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={200}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+            </ScrollView>
+          )}
+        </>
       )}
+
       <ChangeAddressModal />
     </SafeAreaView>
   );

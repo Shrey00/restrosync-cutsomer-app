@@ -11,12 +11,15 @@ import { Button } from "@rneui/themed";
 import Categories from "@/components/Categories";
 import useUserStore from "../../store/userStore";
 import { softwareId, api } from "@/constants/api";
+import { useRouter } from "expo-router";
 export default function Index() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const styles = StyleSheet.create({});
   const [restaurantsState, setRestaurantsState] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
   useEffect(() => {
     (async () => {
       try {
@@ -29,6 +32,7 @@ export default function Index() {
       }
     })();
   }, []);
+  
   return (
     <SafeAreaView
       style={{
