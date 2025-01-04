@@ -1,27 +1,65 @@
-import React from "react";
+import { useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
+import { api } from "../constants/api";
 import { Card, Image, Button } from "@rneui/themed";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FoodItemCard from "@/components/FoodItemCard";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
+import useUserStore from "@/store/userStore";
+import useOrderStore from "@/store/orderStore";
+import {useRouter} from 'expo-router';
 const stages = [
-  { id: 1, name: "Order Confirmed", icon: "check-circle", reached: true },
-  { id: 2, name: "Cooking", icon: "utensils", reached: true },
-  { id: 3, name: "Order Picked Up", icon: "truck", reached: true },
+  { id: 1, name: "Order Confirmed", icon: "check-circle", reached: false },
+  { id: 2, name: "Preparing", icon: "utensils", reached: false },
+  { id: 3, name: "Order Picked Up", icon: "truck", reached: false },
   { id: 4, name: "Out for Delivery", icon: "map-marker-alt", reached: false },
   { id: 5, name: "Delivered", icon: "home", reached: false },
 ];
 
 const OrderStatus = () => {
+  const { orderId } = useLocalSearchParams();
+  const getOrder = useOrderStore((state) => state.getOrder);
+  const orderDetail = getOrder(orderId as string);
+  stages.map((stage) => {
+    if (
+      orderDetail &&
+      orderDetail.deliveryStatus === "Confirmed" &&
+      stage.id <= 1
+    ) {
+      stage.reached = true;
+    } else if (
+      orderDetail &&
+      orderDetail.deliveryStatus === "Preparing" &&
+      stage.id <= 2
+    ) {
+      stage.reached = true;
+    } else if (
+      orderDetail &&
+      orderDetail.deliveryStatus === "Picked" &&
+      stage.id <= 3
+    ) {
+      stage.reached = true;
+    } else if (
+      orderDetail &&
+      orderDetail.deliveryStatus === "Enroute" &&
+      stage.id <= 4
+    ) {
+      stage.reached = true;
+    } else if (
+      orderDetail &&
+      orderDetail.deliveryStatus === "Delivered" &&
+      stage.id <= 5
+    ) {
+      stage.reached = true;
+    }
+  });
+  // const getORder = useOrderStore((state)=>state.getOrder);
   const { theme } = useTheme();
-
-  const router = useRouter();
-
   const styles = StyleSheet.create({
     card: {
       borderRadius: 10,
@@ -88,6 +126,7 @@ const OrderStatus = () => {
     const lineColor = item.reached
       ? theme.colors.primary
       : theme.colors.secondary;
+    // const user = useUserStore((state) => state.user);
 
     return (
       <View style={styles.stageContainer}>
@@ -114,13 +153,14 @@ const OrderStatus = () => {
     );
   };
   const cuisineType = "veg";
+  const router = useRouter();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <View>
         <Pressable
           style={{ marginLeft: 12, flexDirection: "row", alignItems: "center" }}
           onPress={() => {
-            router.replace("/");
+             router.replace("/orders");
           }}
         >
           <Entypo
@@ -131,13 +171,13 @@ const OrderStatus = () => {
           <Text
             style={{
               fontFamily: "jakarta-sans-medium",
-              fontSize: 16,
+              fontSize: 20,
               color: theme.colors.primary,
               marginBottom: 4,
               marginLeft: 1,
             }}
           >
-            Home
+            Orders
           </Text>
         </Pressable>
         <View>
@@ -154,59 +194,46 @@ const OrderStatus = () => {
       </View>
 
       <Card containerStyle={styles.card}>
-        <View style={styles.orderItemsContainerBorder}>
-          <Text
-            style={{
-              ...styles.fontStyles,
-              color: theme.colors.grey0,
-              marginBottom: 6,
-            }}
-          >
-            {" "}
-            OrderID: ABCD123
-          </Text>
-          <View style={styles.flexRowContainer}>
-            <Text style={styles.fontStyles}>
-              {cuisineType === "veg" ? (
-                <VegIcon width={14} height={14} />
-              ) : (
-                <NonVegIcon width={18} height={18} />
-              )}
-              {"  "}
-              {1} x {"Veg Pizza"}
-            </Text>
-            <Text style={styles.fontStyles}>$200</Text>
-          </View>
-          <View style={styles.flexRowContainer}>
-            <Text style={styles.fontStyles}>
-              {cuisineType === "veg" ? (
-                <VegIcon width={14} height={14} />
-              ) : (
-                <NonVegIcon width={18} height={18} />
-              )}
-              {"  "}
-              {1} x {"French Fries"}
-            </Text>
-            <Text style={styles.fontStyles}>$200</Text>
-          </View>
-          <View style={styles.flexRowContainer}>
-            <Text style={styles.fontStyles}>
-              {cuisineType === "veg" ? (
-                <VegIcon width={14} height={14} />
-              ) : (
-                <NonVegIcon width={18} height={18} />
-              )}
-              {"  "}
-              {1} x {"Veg Pizza"}
-            </Text>
-            <Text style={styles.fontStyles}>$200</Text>
-          </View>
-        </View>
-        <View style={styles.flexRowContainer}>
-          <Text style={styles.fontStyles}>Grand Total</Text>
-          <Text style={styles.fontStyles}>$200</Text>
-        </View>
-      </Card>
+              
+                <Text
+                  style={{ fontFamily: "jakarta-sans-semibold", fontSize: 16 }}
+                >
+                  {orderDetail?.restaurantName}
+                </Text>
+
+      
+              <View style={styles.orderItemsContainerBorder}>
+                <Text
+                  style={{
+                    ...styles.fontStyles,
+                    color: theme.colors.grey0,
+                    marginBottom: 6,
+                  }}
+                >
+                  {orderDetail?.orderId}
+                </Text>
+                {orderDetail?.orderItems?.map((orderItem, orderItemIndex) => {
+                  return (
+                    <View style={styles.flexRowContainer} key={orderItemIndex}>
+                      <Text style={styles.fontStyles}>
+                        {orderItem.cuisineType === "veg" ? (
+                          <VegIcon width={14} height={14} />
+                        ) : (
+                          <NonVegIcon width={18} height={18} />
+                        )}
+                        {"  "}
+                        {orderItem.quantity} x {orderItem.name}
+                      </Text>
+                      <Text style={styles.fontStyles}>₹{orderItem.amount}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+              <View style={styles.flexRowContainer}>
+                <Text style={styles.fontStyles}>Grand Total</Text>
+                <Text style={styles.fontStyles}>₹{orderDetail?.totalAmount}</Text>
+              </View>
+            </Card>
       <Card
         containerStyle={{
           ...styles.card,

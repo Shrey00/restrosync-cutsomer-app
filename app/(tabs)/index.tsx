@@ -12,6 +12,7 @@ import Categories from "@/components/Categories";
 import useUserStore from "../../store/userStore";
 import { softwareId, api } from "@/constants/api";
 import { useRouter } from "expo-router";
+import useModalStore from "@/store/modalsStore";
 export default function Index() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -19,7 +20,7 @@ export default function Index() {
   const [restaurantsState, setRestaurantsState] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+  const addAddressModalOpen = useModalStore((state) => state.addAddressModalOpen);
   useEffect(() => {
     (async () => {
       try {

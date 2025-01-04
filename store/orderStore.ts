@@ -20,21 +20,39 @@ type OrderDetails = {
   address: string;
 };
 
+type OrderItem = {
+  name: string;
+  cuisineType: "veg" | "non-veg";
+  status: string;
+  quantity: number;
+  amount: number;
+};
+type Order = {
+  orderId: string;
+  totalAmount: number;
+  deliveryStatus: string;
+  restaurantName: string;
+  createdAt: string | Date;
+  orderItems: OrderItem[];
+};
+type Orders = Order[];
 type OrdersState = {
   newOrderDetails: NewOrderDetails;
-  orders: [];
+  orders: Orders;
   currentOrders: [];
   //   deliveryNoteModalOpen: boolean;
   //   couponsModalOpen: boolean;
   //   confirmLogoutModalOpen: boolean;
   //   paymentOptionsModal: boolean;
   setNewOrderDetails: (newOrderDetails: Partial<NewOrderDetails>) => void;
-  //   setDeliveryNoteModalOpen: (open: boolean) => void;
+  setOrders: (orders: Orders) => void;
+  getOrder: (orderId: string) => Order | undefined;
+  // setDeliveryNoteModalOpen: (open: boolean) => void;
   //   setCouponsModalOpen: (open: boolean) => void;
   //   setConfirmLogoutModalOpen: (open: boolean) => void;
   //   setPaymentOptionsModal: (open: boolean) => void;
 };
-const useOrderStore = create<OrdersState>((set) => ({
+const useOrderStore = create<OrdersState>((set, get) => ({
   newOrderDetails: {
     address: "",
     orderItems: [],
@@ -54,6 +72,18 @@ const useOrderStore = create<OrdersState>((set) => ({
         },
       };
     });
+  },
+  setOrders: (orders) => {
+    set((state) => {
+      return {
+        ...state,
+        orders: [...orders],
+      };
+    });
+  },
+  getOrder: (orderId) => {
+    const { orders } = get();
+    return orders.find((orderItem) => orderItem.orderId === orderId);
   },
 }));
 export default useOrderStore;

@@ -5,6 +5,7 @@ type ModalState = {
   addAddressModalOpen: boolean;
   filtersModalOpen: boolean;
   addToCartModalOpen: boolean;
+  hoverCartInfo: boolean;
   //   deliveryNoteModalOpen: boolean;
   //   couponsModalOpen: boolean;
   //   confirmLogoutModalOpen: boolean;
@@ -13,6 +14,7 @@ type ModalState = {
   setAddAddressModalOpen: (open: boolean) => void;
   setFiltersModalOpen: (open: boolean) => void;
   setAddToCartModalOpen: (open: boolean) => void;
+  setHoverCartInfo: (open: boolean) => void;
   // setDeliveryNoteModalOpen: (open: boolean) => void;
   //   setCouponsModalOpen: (open: boolean) => void;
   //   setConfirmLogoutModalOpen: (open: boolean) => void;
@@ -23,6 +25,7 @@ const useModalStore = create<ModalState>((set) => ({
   addAddressModalOpen: false,
   filtersModalOpen: false,
   addToCartModalOpen: false,
+  hoverCartInfo: false,
   setChangeAddressModalOpen: (open) =>
     set((state) => {
       return {
@@ -49,6 +52,13 @@ const useModalStore = create<ModalState>((set) => ({
       return {
         ...state,
         addToCartModalOpen: open,
+      };
+    }),
+  setHoverCartInfo: (open) =>
+    set((state) => {
+      return {
+        ...state,
+        hoverCartInfo: open,
       };
     }),
 }));

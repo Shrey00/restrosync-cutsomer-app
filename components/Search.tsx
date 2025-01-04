@@ -25,16 +25,18 @@ const SearchBar = ({
       paddingTop: 8,
     },
     inputInnerContainer: {
-      borderBottomWidth: 0,
+      borderWidth: 0.4,
+      borderBottomWidth: 0.4,
+      borderColor: theme.colors.grey4,
       paddingHorizontal: 8,
       margin: 0,
       backgroundColor: "#fff",
       borderRadius: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.02,
+      shadowOpacity:0.02,
       shadowRadius: 4,
-      elevation: 4, // For Android
+      elevation: 2,
     },
     input: {
       fontSize: 14,
@@ -58,9 +60,6 @@ const SearchBar = ({
     } 
   }, [segments]);
 
-  // useEffect(() => {
-  
-  // }, [shouldFocus]);
 
   const router = useRouter();
   const handleSearchBarFocus = () => {

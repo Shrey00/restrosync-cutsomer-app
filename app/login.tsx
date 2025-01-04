@@ -180,13 +180,13 @@ export default function login() {
       >
         <Entypo
           name="chevron-thin-left"
-          size={20}
+          size={24}
           color={theme.colors.primary}
         />
         <Text
           style={{
             fontFamily: "jakarta-sans-medium",
-            fontSize: 16,
+            fontSize: 20,
             color: theme.colors.primary,
             marginBottom: 4,
             marginLeft:2

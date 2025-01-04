@@ -14,7 +14,6 @@ import { api } from "@/constants/api";
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
 import ChangeAddressModal from "@/components/ChangeAddressModal";
-import AddAddressModal from "@/components/AddAddressModal";
 import useUserStore from "../../store/userStore";
 import useCartStore from "../../store/cartStore";
 import useAddressStore from "@/store/addressStore";
@@ -180,7 +179,8 @@ export default function CartsPage() {
   const boolHasSavedAddresses = allAddresses.length > 0;
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
-
+  const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
+  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;
   }
@@ -225,36 +225,59 @@ export default function CartsPage() {
       );
     })();
   }, [cartItemsLoading]);
+
+  const handleDeleteAllCartItems = async () => {
+    const response = await fetch(`${api}/cart/delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    if (response.status === 200) {
+      if (cartItems.length === 1) {
+        setHoverCartInfo(null, --cartItems.length);
+        setHoverCardVisble(false);
+      }
+      setCartItem([]);
+    }
+  };
   const handleOrder = async () => {
     if (boolAddressSelected) {
       try {
         setLoadingPlaceOrder(true);
-        const orderItems = cartItems.map((item, index) => {
+        const orderItems = cartItems.map((item) => {
           return {
             quantity: item.quantity,
             menuId: item.menuItemId,
             addNote: "",
           };
         });
-        setNewOrderDetails({ orderItems });
+        const createOrder = {
+          ...newOrderDetails,
+        };
+        createOrder.orderItems = orderItems;
         const response = await fetch(`${api}/orders/place-order`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${user.token}`,
           },
-          body: JSON.stringify(newOrderDetails),
+          body: JSON.stringify(createOrder),
         });
         const responseData = await response.json();
         if (responseData) {
           setOrderSuccessVisible(true);
+          await handleDeleteAllCartItems();
+          setCartItem([]);
           setTimeout(() => {
             setOrderSuccessVisible(false);
             // router.push("/orders/order-status")
-          }, 1500);
+          }, 1200);
         }
         setLoadingPlaceOrder(false);
       } catch (e) {
+        setLoadingPlaceOrder(false);
         console.log(e);
       }
     } else {
@@ -367,6 +390,7 @@ export default function CartsPage() {
                     }}
                     containerStyle={styles.checkoutButtonContainer}
                     buttonStyle={{
+                      minWidth: "48%",
                       paddingVertical: 12,
                       borderWidth: 0.8,
                       borderColor: theme.colors.primary,
@@ -377,7 +401,8 @@ export default function CartsPage() {
                     title="Place Order"
                     titleStyle={styles.checkoutButtonTitle}
                     loading={loadingPlaceOrder}
-                    buttonStyle={{ width: "87.2%", ...styles.checkoutButton }}
+                    loadingStyle={{ minHeight: 24 }}
+                    buttonStyle={{ minWidth: "50%", ...styles.checkoutButton }}
                     containerStyle={styles.checkoutButtonContainer}
                     disabled={orderButtonDisabled}
                     onPress={handleOrder}

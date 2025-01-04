@@ -10,7 +10,7 @@ type CartState = {
   cartHoverInfo: CartHoverInfo,
   setCartItem: (fullCartArr: CartItem[]) => void;
   addToCart: (item: CartItem) => void;
-  setCartHoverInfo: (item: CartItem, count: number) => void;
+  setCartHoverInfo: (item: CartItem | null, count: number) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   getTotalAmount: () => number;

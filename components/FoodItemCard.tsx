@@ -36,6 +36,8 @@ export default function FoodItemCard({
   const cartItems = useCartStore((state)=>state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
   const setHoverCartInfo = useCartStore((state)=>state.setCartHoverInfo);
+  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+  // const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
   const setCartModalIsOpen = useModalStore(
     (state) => state.setAddToCartModalOpen
   );
@@ -44,7 +46,6 @@ export default function FoodItemCard({
     const index = event.nativeEvent.contentOffset.x / slideSize;
     setActiveIndex(Math.round(index));
   };
-
   async function handleAddToCart() {
     if (cartButtonText !== "Add") return;
     if (!(user.token.length > 0)) {
@@ -93,6 +94,7 @@ export default function FoodItemCard({
         addToCart(cartItemParams);
         setHoverCartInfo(cartItemParams, ++cartItems.length)
         setcartButtonText("Added 🎉");
+        setHoverCardVisble(true);
         setAddToCartLoading(false);
       } catch (e) {
         console.log(e);

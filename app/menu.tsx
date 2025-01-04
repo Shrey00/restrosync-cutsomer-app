@@ -93,7 +93,9 @@ export default function menu() {
   const cartHoverInfo = useCartStore((state) => state.cartHoverInfo);
   const [loadingMenuItems, setLoadingMenuItems] = useState(true);
   const [categoryExpanded, setCategoryExpanded] = useState<boolean[]>([]);
-  const [hoverCardVisble, setHoverCardVisble] = useState(false);
+  // const [hoverCardVisble, setHoverCardVisble] = useState(false);
+  const hoverCardVisble = useModalStore((state)=>state.hoverCartInfo);
+  const setHoverCardVisble = useModalStore((state)=>state.setHoverCartInfo);
   const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
     id: "",
     name: "",
@@ -104,7 +106,7 @@ export default function menu() {
     discount: 0,
     cuisineType: "",
     variant: "",
-    restaurantId: ""
+    restaurantId: "",
   });
   const generateMenuEndpoint = () => {
     var queryParameters: string = "";
@@ -173,7 +175,7 @@ export default function menu() {
         },
       });
       const responseData = await response.json();
-      if(responseData.data.length > 0) {
+      if (responseData.data.length > 0) {
         setCartItem(responseData.data);
         setCartHoverInfo(responseData.data[0], responseData.data.length);
         setHoverCardVisble(true);
@@ -182,7 +184,7 @@ export default function menu() {
   }, []);
   const [prevOffset, setPrevOffset] = useState(0);
   const handleScrollCardView = (event: any) => {
-    if(cart.length === 0){
+    if (cart.length === 0) {
       return;
     }
     const currentOffset = event.nativeEvent.contentOffset.y + 20;
@@ -198,208 +200,204 @@ export default function menu() {
     setPrevOffset(currentOffset);
   };
   return (
-    <>
-      <SafeAreaView
-        style={{
-          backgroundColor: theme.colors.background,
-          flex: 1,
-        }}
-      >
-        <Header user={user} showSearch={true} />
-        <View>
-          <ScrollView
-            contentContainerStyle={{
-              flexDirection: "row",
-              gap: 6,
-              height: 36,
-              maxHeight: 36,
-              marginBottom: 0,
-              paddingHorizontal: 10,
-              marginHorizontal: 0,
+    <SafeAreaView
+      style={{
+        backgroundColor: theme.colors.background,
+        flex: 1,
+      }}
+    >
+      <Header user={user} showSearch={true} />
+      <View>
+        <ScrollView
+          contentContainerStyle={{
+            flexDirection: "row",
+            gap: 6,
+            height: 36,
+            maxHeight: 36,
+            marginBottom: 0,
+            paddingHorizontal: 10,
+            marginHorizontal: 0,
+          }}
+          horizontal={true}
+        >
+          <Badge
+            status="primary"
+            value={name}
+            badgeStyle={styles.badgeStyle}
+            textStyle={styles.badgeTextStyle}
+          />
+          <Badge
+            onPress={() => {
+              setFilterModalOpen(true);
             }}
-            horizontal={true}
-          >
-            <Badge
-              status="primary"
-              value={name}
-              badgeStyle={styles.badgeStyle}
-              textStyle={styles.badgeTextStyle}
-            />
-            <Badge
-              onPress={() => {
-                setFilterModalOpen(true);
-              }}
-              status="primary"
-              value={
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <AntDesign name="filter" size={18} color="black" />
-                  <Text>Filters</Text>
-                </View>
-              }
-              badgeStyle={{
-                ...styles.badgeStyle,
-                ...styles.generalBadgeStyle,
-              }}
-              textStyle={{
-                ...styles.badgeTextStyle,
-                color: theme.colors.grey0,
-              }}
-            />
-
-            {appliedFilters.map((item, index) => {
-              return (
-                <Badge
-                  key={index}
-                  status="primary"
-                  onPress={() => removeFilter(item)}
-                  value={
-                    <View
-                      key={index}
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 2,
-                      }}
-                    >
-                      <Text
-                        style={
-                          item.filter === "veg"
-                            ? [styles.badgeTextStyle, styles.greenColor]
-                            : null
-                        }
-                      >
-                        {item.value}
-                      </Text>
-                      <AntDesign
-                        name="close"
-                        size={16}
-                        color="black"
-                        style={{ marginTop: 2 }}
-                      />
-                    </View>
-                  }
-                  badgeStyle={
-                    item.filter === "veg"
-                      ? [styles.badgeStyle, styles.greenBadgeStyle]
-                      : [styles.badgeStyle, styles.generalBadgeStyle]
-                  }
-                />
-              );
-            })}
-          </ScrollView>
-        </View>
-        {menu.length !== 0 || loadingMenuItems ? (
-          <ScrollView
-            onScroll={(e) => handleScrollCardView(e)}
-            contentContainerStyle={{
-              paddingBottom: 10,
-            }}
-          >
-            {loadingMenuItems ? (
-              <View style={styles.skeletonContainer}>
-                <Skeleton
-                  animation="pulse"
-                  width={CARD_WIDTH}
-                  height={140}
-                  style={styles.skeletonStructure}
-                  skeletonStyle={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  width={CARD_WIDTH}
-                  height={140}
-                  style={styles.skeletonStructure}
-                  skeletonStyle={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  width={CARD_WIDTH}
-                  height={140}
-                  style={styles.skeletonStructure}
-                  skeletonStyle={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  width={CARD_WIDTH}
-                  height={140}
-                  style={styles.skeletonStructure}
-                  skeletonStyle={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  width={CARD_WIDTH}
-                  height={140}
-                  style={styles.skeletonStructure}
-                  skeletonStyle={styles.skeleton}
-                />
+            status="primary"
+            value={
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <AntDesign name="filter" size={18} color="black" />
+                <Text>Filters</Text>
               </View>
-            ) : (
-              menu?.map((item, index) => {
-                return (
-                  <ListItem.Accordion
+            }
+            badgeStyle={{
+              ...styles.badgeStyle,
+              ...styles.generalBadgeStyle,
+            }}
+            textStyle={{
+              ...styles.badgeTextStyle,
+              color: theme.colors.grey0,
+            }}
+          />
+
+          {appliedFilters.map((item, index) => {
+            return (
+              <Badge
+                key={index}
+                status="primary"
+                onPress={() => removeFilter(item)}
+                value={
+                  <View
                     key={index}
-                    animation={{ type: "timing", duration: 50 }}
-                    content={
-                      <>
-                        <ListItem.Content>
-                          <ListItem.Title>{item.category}</ListItem.Title>
-                        </ListItem.Content>
-                      </>
-                    }
-                    isExpanded={categoryExpanded[index]}
-                    onPress={() => {
-                      let categoryExpandedModified = [...categoryExpanded];
-                      categoryExpandedModified[index] =
-                        !categoryExpandedModified[index];
-                      setCategoryExpanded(categoryExpandedModified);
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 2,
                     }}
                   >
-                    {item.items?.map((menuItem, i) => (
-                        <FoodItemCard
-                          key={i}
-                          id={menuItem.id}
-                          restaurantId={menuItem.restaurantId}
-                          name={menuItem.name}
-                          images={menuItem.images}
-                          rating={menuItem.rating}
-                          markedPrice={menuItem.markedPrice}
-                          discount={menuItem.discount}
-                          sellingPrice={menuItem.sellingPrice}
-                          cuisineType={menuItem.cuisineType}
-                          description={menuItem.description}
-                          variant={menuItem.variant}
-                          user={user}
-                          setMenuItemData={() => setMenuItemData(menuItem)}
-                        />
-                    ))}
-                  </ListItem.Accordion>
-                );
-              })
-            )}
-          </ScrollView>
-        ) : (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
+                    <Text
+                      style={
+                        item.filter === "veg"
+                          ? [styles.badgeTextStyle, styles.greenColor]
+                          : null
+                      }
+                    >
+                      {item.value}
+                    </Text>
+                    <AntDesign
+                      name="close"
+                      size={16}
+                      color="black"
+                      style={{ marginTop: 2 }}
+                    />
+                  </View>
+                }
+                badgeStyle={
+                  item.filter === "veg"
+                    ? [styles.badgeStyle, styles.greenBadgeStyle]
+                    : [styles.badgeStyle, styles.generalBadgeStyle]
+                }
+              />
+            );
+          })}
+        </ScrollView>
+      </View>
+      {menu.length !== 0 || loadingMenuItems ? (
+        <ScrollView
+          onScroll={(e) => handleScrollCardView(e)}
+          contentContainerStyle={{
+            paddingBottom: 10,
+          }}
+        >
+          {loadingMenuItems ? (
+            <View style={styles.skeletonContainer}>
+              <Skeleton
+                animation="pulse"
+                width={CARD_WIDTH}
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={CARD_WIDTH}
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={CARD_WIDTH}
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={CARD_WIDTH}
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={CARD_WIDTH}
+                height={140}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              />
+            </View>
+          ) : (
+            menu?.map((item, index) => {
+              return (
+                <ListItem.Accordion
+                  key={index}
+                  animation={{ type: "timing", duration: 50 }}
+                  content={
+                    <ListItem.Content>
+                      <ListItem.Title>{item.category}</ListItem.Title>
+                    </ListItem.Content>
+                  }
+                  isExpanded={categoryExpanded[index]}
+                  onPress={() => {
+                    let categoryExpandedModified = [...categoryExpanded];
+                    categoryExpandedModified[index] =
+                      !categoryExpandedModified[index];
+                    setCategoryExpanded(categoryExpandedModified);
+                  }}
+                >
+                  {item.items?.map((menuItem, i) => (
+                    <FoodItemCard
+                      key={i}
+                      id={menuItem.id}
+                      restaurantId={menuItem.restaurantId}
+                      name={menuItem.name}
+                      images={menuItem.images}
+                      rating={menuItem.rating}
+                      markedPrice={menuItem.markedPrice}
+                      discount={menuItem.discount}
+                      sellingPrice={menuItem.sellingPrice}
+                      cuisineType={menuItem.cuisineType}
+                      description={menuItem.description}
+                      variant={menuItem.variant}
+                      user={user}
+                      setMenuItemData={() => setMenuItemData(menuItem)}
+                    />
+                  ))}
+                </ListItem.Accordion>
+              );
+            })
+          )}
+        </ScrollView>
+      ) : (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Text
+            style={{ marginBottom: 170, fontFamily: "jakarta-sans-medium" }}
           >
-            <Text
-              style={{ marginBottom: 170, fontFamily: "jakarta-sans-medium" }}
-            >
-              Oops! did not found any item.
-            </Text>
-          </View>
-        )}
-      </SafeAreaView>
+            Oops! did not found any item.
+          </Text>
+        </View>
+      )}
       <AddToCartModal menuItemData={menuItemData} />
       <HoverCardCartInfo
         isVisible={hoverCardVisble}
         setIsVisible={setHoverCardVisble}
       />
       <FiltersModal />
-    </>
+    </SafeAreaView>
   );
 }

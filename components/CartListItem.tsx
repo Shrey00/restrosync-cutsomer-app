@@ -9,6 +9,7 @@ import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import { CartItemProps } from "@/types/index";
 import useUserStore from "@/store/userStore";
+import useModalStore from "@/store/modalsStore";
 import { api } from "@/constants/api";
 const CartListItem = ({
   id,
@@ -34,7 +35,10 @@ const CartListItem = ({
   };
   const { token } = useUserStore((state) => state.user);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const cartItems = useCartStore((state) => state.cart);
+  const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const styles = StyleSheet.create({
     listItem: {
       backgroundColor: "transparent",
@@ -132,6 +136,10 @@ const CartListItem = ({
       body: JSON.stringify({ itemId: id }),
     });
     if (response.status === 200) {
+      if (cartItems.length === 1) {
+        setHoverCartInfo(null, --cartItems.length);
+        setHoverCardVisble(false);
+      }
       removeFromCart(id);
     }
   };
@@ -152,7 +160,7 @@ const CartListItem = ({
             <Text style={styles.markedPrice}>₹{markedPrice.toFixed(2)}</Text>
             <Text style={styles.finalPrice}>₹{sellingPrice.toFixed(2)}</Text>
             <Text style={styles.discount}>
-              Save ₹{(markedPrice - sellingPrice)}
+              Save ₹{markedPrice - sellingPrice}
             </Text>
           </View>
         </View>
@@ -184,7 +192,7 @@ const CartListItem = ({
               buttonStyle={styles.quantityButtonPlus}
             />
           </View>
-          <Pressable onPress={()=>handleDeleteCartItem(id)}>
+          <Pressable onPress={() => handleDeleteCartItem(id)}>
             <FontAwesome6
               name="trash-alt"
               size={16}

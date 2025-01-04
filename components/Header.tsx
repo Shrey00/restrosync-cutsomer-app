@@ -74,7 +74,9 @@ const Header = ({
   const setLocation = useLocationStore((state) => state.setLocation);
   const locationText = useLocationStore((state) => state.locationText);
   const setLocationText = useLocationStore((state) => state.setLocationText);
-  const [locationAccessDenied, setLocationAccessDenied] = useState<'waiting' | 'done'>('waiting');
+  const [locationAccessDenied, setLocationAccessDenied] = useState<
+    "waiting" | "done"
+  >("waiting");
 
   const setAddAddressModalOpen = useModalStore(
     (state) => state.setAddAddressModalOpen
@@ -146,7 +148,7 @@ const Header = ({
   }
 
   return (
-    <>
+    <View>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Pressable onPress={handleLocationSetting}>
@@ -160,26 +162,30 @@ const Header = ({
               </View>
 
               <View style={{ minWidth: "60%", maxWidth: "68%" }}>
-                {locationText.city.length > 0 || locationAccessDenied==='done' ? (
-                  <>
+                {locationText.city.length > 0 ||
+                locationAccessDenied === "done" ? (
+                  <View>
                     <Text style={styles.locationText} numberOfLines={1}>
-                      {locationText.subLocality ? 
-                        locationText.subLocality : "----"+ ","}
-                      {locationText.neighbourhood ? 
-                      locationText.neighbourhood : "----" + ","}
+                      {locationText.subLocality
+                        ? locationText.subLocality
+                        : "----" + ","}
+                      {locationText.neighbourhood
+                        ? locationText.neighbourhood
+                        : "----" + ","}
                       {locationText.areaName && locationText.areaName + ","}
                     </Text>
                     <Text style={styles.locationTextCity}>
-                      {locationText.state ? locationText.state : "--"}, {locationText.country ? locationText.country: "--"}
+                      {locationText.state ? locationText.state : "--"},{" "}
+                      {locationText.country ? locationText.country : "--"}
                     </Text>
-                  </>
+                  </View>
                 ) : (
-                  <>
+                  <View>
                     <Text style={styles.locationText} numberOfLines={1}>
                       Loading...
                     </Text>
                     <Text style={styles.locationTextCity}>Loading...</Text>
-                  </>
+                  </View>
                 )}
               </View>
               <Entypo
@@ -212,7 +218,7 @@ const Header = ({
           <SearchBar searchText={searchText} setSearchText={setSearchText} />
         )}
       </View>
-    </>
+    </View>
   );
 };
 

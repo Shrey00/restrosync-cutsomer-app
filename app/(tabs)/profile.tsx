@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Dimensions, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme, Avatar, Card, ListItem } from "@rneui/themed";
+import { useTheme, Avatar, Card, ListItem, Dialog } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -15,11 +15,13 @@ import useMenuStore from "../../store/menuStore";
 import useUserStore from "../../store/userStore";
 import { FoodItemProps } from "@/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import {useRouter} from "expo-router";
+import { useRouter, Link } from "expo-router";
 export default function profile() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const router = useRouter();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const styles = StyleSheet.create({
     cardContainer: {
       borderRadius: 8,
@@ -61,9 +63,10 @@ export default function profile() {
       borderColor: "#EDEDED",
     },
   });
-  router.push("/order-status")
-  const { token } = useUserStore((state) => state.user);
-
+  const toggleLogoutModal = () => {
+    setShowLogoutModal(!showLogoutModal);
+  };
+  const handleLogout = () => {};
   return (
     <SafeAreaView
       style={{
@@ -88,24 +91,29 @@ export default function profile() {
           </View>
         </Card>
         <Card containerStyle={styles.cardContainer}>
-          <ListItem containerStyle={styles.listItem}>
-            <AntDesign name="user" size={20} color={theme.colors.primary} />
-            <ListItem.Content>
-              <ListItem.Title>Profile Details</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
+          <Link href="/profile-settings">
+            <ListItem containerStyle={styles.listItem}>
+              <AntDesign name="user" size={20} color={theme.colors.primary} />
+              <ListItem.Content>
+                <ListItem.Title>Profile Details & Settings</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          </Link>
+
           <ListItem containerStyle={styles.listItem}>
             <Entypo name="address" size={24} color={theme.colors.primary} />
             <ListItem.Content>
               <ListItem.Title>Addresses</ListItem.Title>
             </ListItem.Content>
           </ListItem>
-          <ListItem containerStyle={styles.listItem}>
-            <Feather name="list" size={24} color={theme.colors.primary} />
-            <ListItem.Content>
-              <ListItem.Title>Orders</ListItem.Title>
-            </ListItem.Content>
-          </ListItem>
+          <Link href="/orders">
+            <ListItem containerStyle={styles.listItem}>
+              <Feather name="list" size={24} color={theme.colors.primary} />
+              <ListItem.Content>
+                <ListItem.Title>Orders</ListItem.Title>
+              </ListItem.Content>
+            </ListItem>
+          </Link>
           <ListItem containerStyle={styles.listItem}>
             <Entypo
               name="star-outlined"
@@ -134,8 +142,15 @@ export default function profile() {
               <ListItem.Title>Privacy Policy</ListItem.Title>
             </ListItem.Content>
           </ListItem>
+          <ListItem containerStyle={styles.listItem}>
+            <AntDesign name="Safety" size={24} color={theme.colors.primary} />
+            <ListItem.Content>
+              <ListItem.Title>Advance Settings</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
           <ListItem
             containerStyle={{ ...styles.listItem, borderBottomWidth: 0 }}
+            onPress={toggleLogoutModal}
           >
             <Feather name="log-out" size={24} color={theme.colors.primary} />
             <ListItem.Content>
@@ -144,6 +159,28 @@ export default function profile() {
           </ListItem>
         </Card>
       </ScrollView>
+      <Dialog
+        isVisible={showLogoutModal}
+        onBackdropPress={toggleLogoutModal}
+        overlayStyle={{ borderRadius: 8 }}
+      >
+        <Dialog.Title
+          title="Logout"
+          titleStyle={{ fontFamily: "jakarta-sans-semibold", fontSize: 16 }}
+        />
+        <Text style={{fontFamily:'jakarta-sans-medium'}}>Are you sure you want to logout from the app?</Text>
+        {deleteLoading ? (
+          <Dialog.Loading />
+        ) : (
+          <Dialog.Actions>
+            <Dialog.Button title="Yes" onPress={() => handleLogout()} />
+            <Dialog.Button
+              title="No"
+              onPress={() => setShowLogoutModal(false)}
+            />
+          </Dialog.Actions>
+        )}
+      </Dialog>
     </SafeAreaView>
   );
 }

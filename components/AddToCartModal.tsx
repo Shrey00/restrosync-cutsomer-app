@@ -32,6 +32,9 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [cartButtonText, setcartButtonText] = useState("Add");
   const addToCart = useCartStore((state) => state.addToCart);
+  const cartItems = useCartStore((state) => state.cart);
+  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+  const setHoverCartInfo = useCartStore((state)=>state.setCartHoverInfo);
   const { theme } = useTheme();
   const IMAGE_WIDTH = 70;
   const user = useUserStore((state) => state.user);
@@ -202,7 +205,9 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
         restaurantId: menuItemData.restaurantId
       };
       addToCart(cartItemParams);
+      setHoverCartInfo(cartItemParams, ++cartItems.length)
       setcartButtonText("Added 🎉");
+      setHoverCardVisble(true);
       setTimeout(() => {
         setIsOpen(false);
       }, 1000);

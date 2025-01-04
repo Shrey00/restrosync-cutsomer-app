@@ -138,7 +138,9 @@ export default function RootLayout() {
         <Stack.Screen name="offers" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="menu" options={{ headerShown: false }} />
-        <Stack.Screen name="order-status" options={{ headerShown: false }} />
+        <Stack.Screen name="order-details" options={{ headerShown: false }} />
+        <Stack.Screen name="orders" options={{ headerShown: false }} />
+        <Stack.Screen name="profile-settings" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

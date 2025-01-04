@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "eatsinn",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -21,7 +21,7 @@
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "------"
+          "apiKey": "AIzaSyD9lEzHem9Bo1y-d0ezg3C3gmb6zTtJIVM"
         }
       },
       "adaptiveIcon": {
