@@ -16,39 +16,98 @@ import useUserStore from "../store/userStore";
 import { save, updateToken } from "@/utils";
 import { router } from "expo-router";
 import { api } from "../constants/api";
+import { validatePathConfig } from "@react-navigation/native";
+import { Link } from "expo-router";
 const LoginScreen = () => {
   const { theme } = useTheme();
   const [useOtp, setUseOtp] = useState(false);
   const [email, setEmail] = useState("");
+  const [sentOtp, setSentOtp] = useState(false);
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [warningText, setWarningText] = useState("");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const handleLogin = async () => {
     if (useOtp) {
-      console.log("Logging in with OTP:", otp);
+      try {
+        setIsOtpLoading(true);
+        const response = await fetch(`${api}/send-otp-login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await response.json();
+        if (data.statusCode === 401) {
+          setWarningText("Account not found");
+        } else {
+          setSentOtp(true);
+        }
+        setIsOtpLoading(false);
+      } catch (e) {
+        console.log(e);
+      }
     } else {
-      // Phone/Email
       setIsLoading(true);
       try {
         const response = await fetch(`${api}/signin`, {
           method: "POST",
           headers: {
-            // Accept: 'application/json',
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({ email, password }).toString(),
         });
         const responseData = await response.json();
-        const userData = responseData.data[0];
-        save("token", userData.token);
-        save("refreshToken", userData.refreshToken);
-        setUser(userData);
-        setIsLoading(false);
-        router.push("/(tabs)");
+        if (response.status === 200) {
+          const userData = responseData.data[0];
+          await save("token", userData.token);
+          await save("refreshToken", userData.refreshToken);
+          setUser(userData);
+          setIsLoading(false);
+          setWarningText("");
+          router.push("/(tabs)");
+        } else {
+          setWarningText(responseData.desc);
+          setIsLoading(false);
+        }
       } catch (e) {
         console.log(e);
+        setIsLoading(false);
       }
+    }
+  };
+
+  const handleOTPLogin = async () => {
+    setVerifyOtpLoading(true);
+    const response = await fetch(`${api}/verify-otp-login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ phone, otp }),
+    });
+    const data = await response.json();
+    setVerifyOtpLoading(false);
+    if (!data.statusCode) {
+      setWarningText("");
+      const userData = data[0];
+      await save("token", userData.token);
+      await save("refreshToken", userData.refreshToken);
+      setUser(userData);
+      setIsLoading(false);
+      setWarningText("");
+      router.push("/(tabs)");
+    }
+    if (data.statusCode === 400) {
+      setOtp("");
+      setPhone("");
+      setSentOtp(false);
+      setWarningText("OTP didn't match");
     }
   };
   return (
@@ -69,40 +128,77 @@ const LoginScreen = () => {
             onChangeText={setPassword}
             textContentType="password"
           />
+          {!!warningText.length && (
+            <Text style={{ color: theme.colors.error, textAlign: "center" }}>
+              {warningText}
+            </Text>
+          )}
           <Button
             title="Login"
             loading={isLoading}
             onPress={handleLogin}
             buttonStyle={styles.button}
             titleStyle={styles.buttonText}
+            loadingStyle={{ height: 25.5 }}
           />
         </>
       ) : (
         <>
-          <Text style={styles.otpText}>Enter OTP</Text>
-          <CustomInput
-            placeholder="Enter OTP"
-            value={otp}
-            onChangeText={setOtp}
-            keyboardType="number-pad"
-            maxLength={6}
-            leftIcon={
-              <MaterialIcons
-                name="password"
-                size={24}
-                color={theme.colors.primary}
+          {!sentOtp ? (
+            <View>
+              <Text style={styles.otpText}>Login with OTP</Text>
+              <CustomInput
+                placeholder="Phone no."
+                value={phone}
+                onChangeText={setPhone}
+                style={{ paddingVertical: 8 }}
+                keyboardType="number-pad"
+                maxLength={10}
               />
-            }
-          />
-          <Button
-            title="Verify OTP"
-            onPress={handleLogin}
-            buttonStyle={styles.button}
-            titleStyle={styles.buttonText}
-          />
+              {!!warningText.length && (
+                <Text
+                  style={{ color: theme.colors.error, textAlign: "center" }}
+                >
+                  {warningText}
+                </Text>
+              )}
+              <Button
+                title="Send OTP"
+                onPress={handleLogin}
+                loading={isOtpLoading}
+                buttonStyle={styles.button}
+                titleStyle={styles.buttonText}
+                loadingStyle={{ height: 25.5 }}
+              />
+            </View>
+          ) : (
+            <View>
+              <CustomInput
+                placeholder="Enter OTP"
+                value={otp}
+                onChangeText={setOtp}
+                keyboardType="number-pad"
+                maxLength={6}
+                leftIcon={
+                  <MaterialIcons
+                    name="password"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                }
+              />
+              <Button
+                title="Verify OTP"
+                loading={verifyOtpLoading}
+                onPress={handleOTPLogin}
+                buttonStyle={styles.button}
+                titleStyle={styles.buttonText}
+                loadingStyle={{ height: 25.5 }}
+              />
+            </View>
+          )}
         </>
       )}
-
       <Button
         title={useOtp ? "Use Phone/Email" : "Use OTP Instead"}
         type="clear"
@@ -164,6 +260,10 @@ export default function login() {
       fontFamily: "jakarta-sans-regular",
       paddingHorizontal: 20,
     },
+    switchText: {
+      color: "#2089dc",
+      fontFamily: "jakarta-sans-semibold",
+    },
   });
   return (
     <SafeAreaView
@@ -189,7 +289,7 @@ export default function login() {
             fontSize: 20,
             color: theme.colors.primary,
             marginBottom: 4,
-            marginLeft:2
+            marginLeft: 2,
           }}
         >
           Home
@@ -204,6 +304,18 @@ export default function login() {
         steps!
       </Text>
       <LoginScreen />
+      <Text
+        style={{
+          color: theme.colors.grey2,
+          textAlign: "center",
+          marginTop: 25,
+        }}
+      >
+        Don't have an account?
+      </Text>
+      <Link href="/signup" style={{ textAlign: "center" }}>
+        <Text style={{ ...styles.switchText }}>Signup</Text>
+      </Link>
     </SafeAreaView>
   );
 }

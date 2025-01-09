@@ -1,7 +1,7 @@
 import React from "react";
 import OfferLinkCard from "@/components/OfferLinkCard";
 import BrandLinkCard from "@/components/BrandLinkCard";
-import { RestaurantType } from "@/types";
+import { RestaurantType, MenuItem } from "@/types";
 import { View, Text, Pressable } from "react-native";
 import { ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "@rneui/themed";
@@ -17,8 +17,8 @@ const SlideLinkCardSection = ({
 }: {
   heading: string;
   link: { text: string; link: Href<string | object> };
-  cardData: RestaurantType[];
-  sectionType: "offers" | "brands";
+  cardData: any[];
+  sectionType: "popular" | "brands";
   loading: boolean;
 }) => {
   const { theme } = useTheme();
@@ -96,7 +96,7 @@ const SlideLinkCardSection = ({
           )}
           {cardData.map((item, index) => {
             return (
-              <>
+              <View key={index}>
                 {sectionType === "brands" && (
                   <Pressable
                     key={index}
@@ -108,7 +108,6 @@ const SlideLinkCardSection = ({
                     }}
                   >
                     <BrandLinkCard
-                      key={index}
                       imageSource={{ uri: item.logo }} // Replace with your image URL
                       title={item.name}
                       showOffer={false}
@@ -116,16 +115,15 @@ const SlideLinkCardSection = ({
                     />
                   </Pressable>
                 )}
-                {sectionType === "offers" && (
-                  <Link key={index} href="/offers">
+                {sectionType === "popular" && (
+                  <Link key={index} href="/menu">
                     <OfferLinkCard
-                      key={index}
-                      imageSource={{ uri: item.logo }} // Replace with your image URL
+                      imageSource={{ uri: item.images[0] }}
                       title={item.name}
                     />
                   </Link>
                 )}
-              </>
+              </View>
             );
           })}
         </View>

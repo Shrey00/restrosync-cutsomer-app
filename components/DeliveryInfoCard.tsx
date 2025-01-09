@@ -21,6 +21,7 @@ import { api } from "@/constants/api";
 import useModalStore from "@/store/modalsStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
+import useUserStore from "@/store/userStore";
 const DeliveryInfoCard = ({
   boolAddressSelected,
   boolHasSavedAddresses,
@@ -45,7 +46,6 @@ const DeliveryInfoCard = ({
     },
     deliveryCardRow: {
       flexDirection: "row",
-      //   alignItems: "center",
       gap: 6,
       paddingBottom: 6,
       borderBottomWidth: 1,
@@ -59,6 +59,7 @@ const DeliveryInfoCard = ({
   }
   const setAddress = useAddressStore((state) => state.setAddress);
   const allAddresses = useAddressStore((state) => state.allAddresses);
+  const user = useUserStore((state) => state.user);
   const address = useAddressStore((state) => state.address);
   const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
   const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
@@ -89,12 +90,13 @@ const DeliveryInfoCard = ({
             Delivery at{" "}
           </Text>
           <Text style={{ fontFamily: "jakarta-sans-semibold", fontSize: 12 }}>
-            {boolHasSavedAddresses}
-            355, Sector 12, Kotra Bhatha, Atal Nagar, Raipur
+            {boolHasSavedAddresses
+              ? `${address.address_line_1}, ${address.address_line_2}, ${address.city}.`
+              : ""}
           </Text>
 
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Button
+            {/* <Button
               icon={
                 <AntDesign
                   name="plus"
@@ -112,7 +114,7 @@ const DeliveryInfoCard = ({
                 borderWidth: 0.6,
               }}
               containerStyle={{ marginTop: 6 }}
-            />
+            /> */}
             <Button
               icon={
                 !boolHasSavedAddresses && !boolAddressSelected ? (
@@ -166,10 +168,10 @@ const DeliveryInfoCard = ({
         />
         <View style={{ flexDirection: "row" }}>
           <Text style={{ fontFamily: "jakarta-sans-regular", fontSize: 14 }}>
-            Pankaj Sharma,{" "}
+            {user.firstName} {user.lastName},{" "}
           </Text>
           <Text style={{ fontFamily: "jakarta-sans-semibold", fontSize: 14 }}>
-            +91 9174524055
+            +91 {user.contact}
           </Text>
         </View>
       </View>

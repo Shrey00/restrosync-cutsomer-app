@@ -2,8 +2,9 @@ import Header from "@/components/Header";
 import useUserStore from "@/store/userStore";
 import { useTheme, ListItem } from "@rneui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Feather from '@expo/vector-icons/Feather';
+import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useState } from "react";
+import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import {
   StyleSheet,
   View,
@@ -30,6 +31,7 @@ import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import VegIcon from "../../assets/veg-icon.svg";
 import NonVegIcon from "../../assets/non-veg-icon.svg";
 import useMenuStore from "@/store/menuStore";
+import useModalStore from "@/store/modalsStore";
 type SearchItem = {
   itemName: string | null;
   restaurantName: string;
@@ -46,6 +48,10 @@ const search = () => {
   const router = useRouter();
   const removeFilter = useMenuStore((state) => state.removeFilter);
   const addFilter = useMenuStore((state) => state.addFilter);
+  const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  const setHoverOrderCardVisible = useModalStore(
+    (state) => state.setHoverOrderInfo
+  );
   const fetchResults = async (query: string) => {
     try {
       const response = await fetch(`${api}/menu/search?searchQuery=${query}`);
@@ -56,7 +62,7 @@ const search = () => {
     }
   };
   useEffect(() => {
-    if (searchText.length > 0) {  
+    if (searchText.length > 0) {
       setLoading(true);
     } else {
       setLoading(false);
@@ -248,12 +254,20 @@ const search = () => {
           }}
         >
           <Text
-            style={{ marginBottom: 170, fontFamily: "jakarta-sans-medium", fontSize:16 }}
+            style={{
+              marginBottom: 170,
+              fontFamily: "jakarta-sans-medium",
+              fontSize: 16,
+            }}
           >
             Couldn't find what you're looking for.
           </Text>
         </View>
       )}
+      <HoverCardOrderInfo
+        isVisible={hoverOrderCardVisible}
+        setIsVisible={setHoverOrderCardVisible}
+      />
     </SafeAreaView>
   );
 };

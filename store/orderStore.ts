@@ -47,6 +47,7 @@ type OrdersState = {
   setNewOrderDetails: (newOrderDetails: Partial<NewOrderDetails>) => void;
   setOrders: (orders: Orders) => void;
   getOrder: (orderId: string) => Order | undefined;
+  getCurrentOrders: () => Orders;
   // setDeliveryNoteModalOpen: (open: boolean) => void;
   //   setCouponsModalOpen: (open: boolean) => void;
   //   setConfirmLogoutModalOpen: (open: boolean) => void;
@@ -84,6 +85,16 @@ const useOrderStore = create<OrdersState>((set, get) => ({
   getOrder: (orderId) => {
     const { orders } = get();
     return orders.find((orderItem) => orderItem.orderId === orderId);
+  },
+  getCurrentOrders: () => {
+    const { orders } = get();
+    const currentOrders = orders.filter((order) => {
+      return (
+        order.deliveryStatus !== "Delivered" &&
+        order.deliveryStatus !== "Cancelled"
+      );
+    });
+    return currentOrders;
   },
 }));
 export default useOrderStore;

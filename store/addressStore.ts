@@ -6,7 +6,7 @@ type AddressState = {
   setAddress: (address: AddressType) => void;
   setAllAddresses: (address: AddressType[]) => void;
 };
-const useAddressStore = create<AddressState>((set) => ({
+const useAddressStore = create<AddressState>((set, get) => ({
   address: {
     id: "",
     address_line_1: "",

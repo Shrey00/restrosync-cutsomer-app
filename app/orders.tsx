@@ -8,6 +8,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import useUserStore from "@/store/userStore";
 import OrderItemDropdown from "@/components/OrderItemDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Link } from "expo-router";
 import FoodItemCard from "@/components/FoodItemCard";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
@@ -88,39 +89,6 @@ const OrderStatus = () => {
     },
   });
 
-  const renderStage = ({ item, index }: { item: any; index: number }) => {
-    const isLastStage = index === stages.length - 1;
-    const circleColor = item.reached
-      ? theme.colors.primary
-      : theme.colors.secondary;
-    const lineColor = item.reached
-      ? theme.colors.primary
-      : theme.colors.secondary;
-
-    return (
-      <View style={styles.stageContainer}>
-        {/* Left Circle with Icon */}
-        <View style={styles.iconContainer}>
-          <View style={[styles.circle, { borderColor: circleColor }]}>
-            <Icon
-              name={item.icon}
-              type="font-awesome-5"
-              size={20}
-              color={
-                item.reached ? theme.colors.primary : theme.colors.secondary
-              }
-            />
-          </View>
-          {!isLastStage && (
-            <View style={[styles.line, { backgroundColor: lineColor }]} />
-          )}
-        </View>
-
-        {/* Stage Name */}
-        <Text style={styles.stageText}>{item.name}</Text>
-      </View>
-    );
-  };
   const cuisineType = "veg";
   useEffect(() => {
     (async () => {
@@ -158,69 +126,99 @@ const OrderStatus = () => {
           Profile
         </Text>
       </Pressable>
-      <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
-        {orders?.map((order, orderIndex) => {
-          return (
-            <Pressable onPress={()=>router.push(`/order-details?orderId=${order.orderId}`)}>
-              <Card containerStyle={styles.card} key={orderIndex}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
+      {orders.length > 0 ? (
+        <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
+          {orders?.map((order, orderIndex) => {
+            return (
+              <Pressable
+                key={orderIndex}
+                onPress={() =>
+                  router.push(`/order-details?orderId=${order.orderId}`)
+                }
+              >
+                <Card containerStyle={styles.card}>
+                  <View
                     style={{
-                      fontFamily: "jakarta-sans-semibold",
-                      fontSize: 16,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    {order.restaurantName}
-                  </Text>
-                  <OrderItemDropdown id={order.orderId} />
-                </View>
-                <View style={styles.orderItemsContainerBorder}>
-                  <Text
-                    style={{
-                      ...styles.fontStyles,
-                      color: theme.colors.grey0,
-                      marginBottom: 6,
-                    }}
-                  >
-                    {order.orderId}
-                  </Text>
-                  {order.orderItems?.map((orderItem, orderItemIndex) => {
-                    return (
-                      <View
-                        style={styles.flexRowContainer}
-                        key={orderItemIndex}
-                      >
-                        <Text style={styles.fontStyles}>
-                          {orderItem.cuisineType === "veg" ? (
-                            <VegIcon width={14} height={14} />
-                          ) : (
-                            <NonVegIcon width={18} height={18} />
-                          )}
-                          {"  "}
-                          {orderItem.quantity} x {orderItem.name}
-                        </Text>
-                        <Text style={styles.fontStyles}>
-                          ₹{orderItem.amount}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-                <View style={styles.flexRowContainer}>
-                  <Text style={styles.fontStyles}>Grand Total</Text>
-                  <Text style={styles.fontStyles}>₹{order.totalAmount}</Text>
-                </View>
-              </Card>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+                    <Text
+                      style={{
+                        fontFamily: "jakarta-sans-semibold",
+                        fontSize: 16,
+                      }}
+                    >
+                      {order.restaurantName}
+                    </Text>
+                    <OrderItemDropdown id={order.orderId} />
+                  </View>
+                  <View style={styles.orderItemsContainerBorder}>
+                    <Text
+                      style={{
+                        ...styles.fontStyles,
+                        color: theme.colors.grey0,
+                        marginBottom: 6,
+                      }}
+                    >
+                      {order.orderId}
+                    </Text>
+                    {order.orderItems?.map((orderItem, orderItemIndex) => {
+                      return (
+                        <View
+                          style={styles.flexRowContainer}
+                          key={orderItemIndex}
+                        >
+                          <Text style={styles.fontStyles}>
+                            {orderItem.cuisineType === "veg" ? (
+                              <VegIcon width={14} height={14} />
+                            ) : (
+                              <NonVegIcon width={18} height={18} />
+                            )}
+                            {"  "}
+                            {orderItem.quantity} x {orderItem.name}
+                          </Text>
+                          <Text style={styles.fontStyles}>
+                            ₹{orderItem.amount}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                  <View style={styles.flexRowContainer}>
+                    <Text style={styles.fontStyles}>Grand Total</Text>
+                    <Text style={styles.fontStyles}>₹{order.totalAmount}</Text>
+                  </View>
+                </Card>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
+            Haven't ordered yet!{" "}
+            <Link
+              style={{
+                color: theme.colors.primary,
+                textDecorationLine: "underline",
+                textDecorationStyle: "solid",
+              }}
+              href="/"
+            >
+              Let's order
+            </Link>
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

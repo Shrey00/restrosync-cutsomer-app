@@ -4,6 +4,7 @@ import { Card, Button, useTheme } from "@rneui/themed";
 import useCartStore from "@/store/cartStore";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import useModalStore from "@/store/modalsStore";
 const HoverCardCartInfo = ({
   isVisible,
   setIsVisible,
@@ -21,6 +22,7 @@ const HoverCardCartInfo = ({
   };
 
   const { theme } = useTheme();
+  const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const styles = StyleSheet.create({
     mainContainer: {
       margin: 16,
@@ -34,7 +36,7 @@ const HoverCardCartInfo = ({
       shadowRadius: 4,
       elevation: 1,
       backgroundColor: "#FEFEFE",
-      bottom: 0,
+      bottom: hoverOrderCardVisible ? 80 : 0,
       left: 0,
       right: 0,
       borderWidth: 0.8,

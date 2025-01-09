@@ -7,6 +7,8 @@ import { useTheme } from "@rneui/themed";
 import { useRouter, useSegments } from "expo-router";
 import { api } from "../constants/api";
 import useMenuStore from "@/store/menuStore";
+import useModalStore from "@/store/modalsStore";
+import useOrderStore from "@/store/orderStore";
 const SearchBar = ({
   setSearchText,
   searchText,
@@ -15,7 +17,12 @@ const SearchBar = ({
   searchText?: string;
 }) => {
   const { theme } = useTheme();
-
+  const getCurrentOrders = useOrderStore((state) => state.getCurrentOrders);
+  const currentOrders = getCurrentOrders();
+  const orders = useOrderStore((state) => state.orders);
+  const setHoverOrderCardVisible = useModalStore(
+    (state) => state.setHoverOrderInfo
+  );
   const styles = StyleSheet.create({
     inputOuterContainer: {
       width: "100%",
@@ -34,7 +41,7 @@ const SearchBar = ({
       borderRadius: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity:0.02,
+      shadowOpacity: 0.02,
       shadowRadius: 4,
       elevation: 2,
     },
@@ -56,10 +63,12 @@ const SearchBar = ({
   const segments = useSegments(); // Detects route changes
   useEffect(() => {
     if (segments[1] === "search" && inputRef.current) {
+      setHoverOrderCardVisible(false);
       inputRef.current?.focus();
-    } 
-  }, [segments]);
-
+    } else if (orders.length > 0) {
+      setHoverOrderCardVisible(true);
+    }
+  }, [segments, orders]);
 
   const router = useRouter();
   const handleSearchBarFocus = () => {

@@ -20,29 +20,31 @@ export interface User {
   token: string;
 }
 
+export interface MenuItem {
+  id: string;
+  name: string;
+  restaurantId: string;
+  category: string;
+  type: string;
+  cuisineType: string;
+  orders: number;
+  description: string;
+  rating: number;
+  reviewSummary: string;
+  markedPrice: number;
+  sellingPrice: number;
+  discount: number;
+  calories: number;
+  healthScore: number;
+  showHealthInfo: boolean;
+  variant: "add-ons" | "parent" | "child" | "none";
+  images: string[];
+}
+
 export interface Menu {
   categoryId: string;
   category: string;
-  items: {
-    id: string;
-    name: string;
-    restaurantId: string;
-    category: string;
-    type: string;
-    cuisineType: string;
-    orders: number;
-    description: string;
-    rating: number;
-    reviewSummary: string;
-    markedPrice: number;
-    sellingPrice: number;
-    discount: number;
-    calories: number;
-    healthScore: number;
-    showHealthInfo: boolean;
-    variant: "add-ons" | "parent" | "child" | "none";
-    images: string[];
-  }[];
+  items: MenuItem[];
 }
 
 export type CartItem = {
@@ -58,7 +60,7 @@ export type CartItem = {
 };
 export interface CartItemProps {
   id: string;
-  menuItemId: string,
+  menuItemId: string;
   restaurantId: string;
   name: string;
   cuisineType: string;

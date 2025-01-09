@@ -26,13 +26,14 @@ import { FoodItemProps } from "@/types";
 import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import HoverCardCartInfo from "@/components/HoverCardCartInfo";
+import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import useCartStore from "@/store/cartStore";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
 export default function menu() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
-  const { name, restaurantId, search } = useLocalSearchParams();
+  const { name, restaurantId } = useLocalSearchParams();
   const setFilterModalOpen = useModalStore(
     (state) => state.setFiltersModalOpen
   );
@@ -96,6 +97,10 @@ export default function menu() {
   // const [hoverCardVisble, setHoverCardVisble] = useState(false);
   const hoverCardVisble = useModalStore((state)=>state.hoverCartInfo);
   const setHoverCardVisble = useModalStore((state)=>state.setHoverCartInfo);
+  const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  const setHoverOrderCardVisible = useModalStore(
+    (state) => state.setHoverOrderInfo
+  );
   const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
     id: "",
     name: "",
@@ -396,6 +401,10 @@ export default function menu() {
       <HoverCardCartInfo
         isVisible={hoverCardVisble}
         setIsVisible={setHoverCardVisble}
+      />
+      <HoverCardOrderInfo
+        isVisible={hoverOrderCardVisible}
+        setIsVisible={setHoverOrderCardVisible}
       />
       <FiltersModal />
     </SafeAreaView>

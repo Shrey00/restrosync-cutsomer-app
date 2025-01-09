@@ -10,7 +10,7 @@ import OrderSuccessMessage from "@/components/OrderSuccessMessage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
-
+import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
 import ChangeAddressModal from "@/components/ChangeAddressModal";
@@ -180,7 +180,12 @@ export default function CartsPage() {
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
-  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+  const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
+  const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  const setHoverOrderCardVisible = useModalStore(
+    (state) => state.setHoverOrderInfo
+  );
+  const setOrders = useOrderStore((state) => state.setOrders);
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;
   }
@@ -194,7 +199,6 @@ export default function CartsPage() {
             Authorization: `Bearer ${user.token}`,
           },
         });
-
         const responseData = await response.json();
         setCartItem(responseData.data);
         setCartItemsLoading(false);
@@ -227,7 +231,7 @@ export default function CartsPage() {
   }, [cartItemsLoading]);
 
   const handleDeleteAllCartItems = async () => {
-    const response = await fetch(`${api}/cart/delete`, {
+    const response = await fetch(`${api}/cart/delete-all`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -237,10 +241,20 @@ export default function CartsPage() {
     if (response.status === 200) {
       if (cartItems.length === 1) {
         setHoverCartInfo(null, --cartItems.length);
-        setHoverCardVisble(false);
+        setHoverCartVisible(false);
       }
       setCartItem([]);
     }
+  };
+  const fetchLatestOrders = async () => {
+    const response = await fetch(`${api}/orders/my-orders`, {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    const data = await response.json();
+    setOrders(data);
+    setHoverOrderCardVisible(true);
   };
   const handleOrder = async () => {
     if (boolAddressSelected) {
@@ -269,6 +283,8 @@ export default function CartsPage() {
         if (responseData) {
           setOrderSuccessVisible(true);
           await handleDeleteAllCartItems();
+          fetchLatestOrders();
+          setHoverOrderCardVisible(true);
           setCartItem([]);
           setTimeout(() => {
             setOrderSuccessVisible(false);
@@ -332,26 +348,6 @@ export default function CartsPage() {
                     ))}
                     {cartItems.length === 0 && <View></View>}
                   </Card>
-                  {/* coupons button */}
-                  {/* <Card containerStyle={styles.listItemContainer}>
-            <View style={styles.couponsContainer}>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-              >
-                <MaterialCommunityIcons
-                  name="brightness-percent"
-                  size={19}
-                  color={theme.colors.primary}
-                />
-                <Text style={styles.viewCouponText}>View all coupons</Text>
-              </View>
-              <Entypo
-                name="chevron-thin-right"
-                size={20}
-                color={theme.colors.primary}
-              />
-            </View>
-          </Card> */}
                   <DeliveryInfoCard
                     boolAddressSelected={boolAddressSelected}
                     boolHasSavedAddresses={boolHasSavedAddresses}
@@ -467,6 +463,12 @@ export default function CartsPage() {
       )}
 
       <ChangeAddressModal />
+      {cartItems.length === 0 && (
+        <HoverCardOrderInfo
+          isVisible={hoverOrderCardVisible}
+          setIsVisible={setHoverOrderCardVisible}
+        />
+      )}
     </SafeAreaView>
   );
 }

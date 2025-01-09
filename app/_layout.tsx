@@ -112,11 +112,14 @@ export default function RootLayout() {
             const userData = retriedRequestData.data[0];
             setUser({ ...userData, token });
             setLoadingUser(false);
-          } else {
-            //if token was not expired.
+          } else if (!responseData.statusCode) {
+            console.log("HERE THAT IS");
+            console.log(responseData);
             const userData = responseData.data[0];
             setUser({ ...userData, token });
             setLoadingUser(false);
+          } else {
+            console.log(responseData); //case for error @TODO implement better error handling
           }
         } catch (e) {
           console.log(e);
@@ -137,10 +140,17 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="offers" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" options={{ headerShown: false }} />
         <Stack.Screen name="menu" options={{ headerShown: false }} />
         <Stack.Screen name="order-details" options={{ headerShown: false }} />
         <Stack.Screen name="orders" options={{ headerShown: false }} />
-        <Stack.Screen name="profile-settings" options={{ headerShown: false }} />
+        <Stack.Screen name="order-status" options={{ headerShown: false }} />
+        <Stack.Screen name="address" options={{ headerShown: false }} />
+        <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="profile-settings"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );
