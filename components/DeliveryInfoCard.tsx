@@ -63,6 +63,12 @@ const DeliveryInfoCard = ({
   const address = useAddressStore((state) => state.address);
   const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
   const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
+  const setAddNoteModalOpen = useModalStore(
+    (state) => state.setAddNoteModalOpen
+  );
+  function handleAddNoteModal() {
+    setAddNoteModalOpen(true);
+  }
   return (
     <Card containerStyle={styles.cardContainer}>
       {/* delivery-time-row */}
@@ -96,7 +102,7 @@ const DeliveryInfoCard = ({
           </Text>
 
           <View style={{ flexDirection: "row", gap: 8 }}>
-            {/* <Button
+            <Button
               icon={
                 <AntDesign
                   name="plus"
@@ -114,7 +120,8 @@ const DeliveryInfoCard = ({
                 borderWidth: 0.6,
               }}
               containerStyle={{ marginTop: 6 }}
-            /> */}
+              onPress={handleAddNoteModal}
+            />
             <Button
               icon={
                 !boolHasSavedAddresses && !boolAddressSelected ? (
@@ -122,6 +129,7 @@ const DeliveryInfoCard = ({
                     name="plus"
                     size={16}
                     color="#FDE4E8"
+                    s
                     style={{ marginRight: 6 }}
                   />
                 ) : (

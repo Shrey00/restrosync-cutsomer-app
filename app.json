@@ -4,7 +4,7 @@
     "slug": "eatsinn",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/eatsinn-demo.png",
     "scheme": "eatsinn",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -25,13 +25,14 @@
         }
       },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/eatsinn-demo.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
+      "usesCleartextTraffic": true,
       "package": "com.zyptec.eatsinn"
     },
     "web": {
@@ -75,6 +76,12 @@
         "projectId": "7f97f5f6-3e97-4e7b-b441-96de3c643091"
       }
     },
-    "owner": "shrey00"
+    "owner": "shrey00",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7f97f5f6-3e97-4e7b-b441-96de3c643091"
+    }
   }
 }

@@ -14,16 +14,16 @@ import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
 import ChangeAddressModal from "@/components/ChangeAddressModal";
+import AddNoteModal from "@/components/AddNoteModal";
+import ApplyCouponModal from "@/components/ApplyCouponModal";
 import useUserStore from "../../store/userStore";
 import useCartStore from "../../store/cartStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
-import { CartItem } from "@/types";
 import { Link } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import { AddressType } from "../../types";
 import { useRouter, Redirect } from "expo-router";
-import { restaurantId } from "@/constants/restaurantInfo";
 export default function CartsPage() {
   const { theme } = useTheme();
   const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
@@ -166,6 +166,7 @@ export default function CartsPage() {
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
   const getTotalSavings = useCartStore((state) => state.getTotalSavings);
   const setCartItem = useCartStore((state) => state.setCartItem);
+  const appliedCoupon = useCartStore((state) => state.appliedCoupon);
   const setChangeAddressModalOpen = useModalStore(
     (state) => state.setChangeAddressModalOpen
   );
@@ -177,11 +178,26 @@ export default function CartsPage() {
   const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
   const boolAddressSelected = (address.id ? address.id.length : 0) > 0;
   const boolHasSavedAddresses = allAddresses.length > 0;
+  const [appliedCouponMessage, setAppliedCouponMessage] = useState("");
+  const [totalAmount, setTotalAmount] = useState<{
+    totalAmount: number;
+    discountAmount: number;
+    payableAmount: number;
+  }>({
+    totalAmount: 0,
+    discountAmount: 0,
+    payableAmount: 0,
+  });
+  const [totalSavings, setTotalSavings] = useState(0);
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  const couponsModalOpen = useModalStore((state) => state.couponsModalOpen);
+  const setCouponsModalOpen = useModalStore(
+    (state) => state.setCouponsModalOpen
+  );
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
@@ -189,6 +205,11 @@ export default function CartsPage() {
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;
   }
+  // if (appliedCoupon) {
+  // }
+  // useEffect(() => {
+  //   console.log("HEY THIS IS APPLIED COUPON", appliedCoupon);
+  // }, [appliedCoupon]);
   useEffect(() => {
     (async () => {
       try {
@@ -300,6 +321,16 @@ export default function CartsPage() {
       setChangeAddressModalOpen(true);
     }
   };
+
+  useEffect(() => {
+    const totalAmount = getTotalAmount();
+    const totalSavings = getTotalSavings();
+    setTotalSavings(totalSavings + totalAmount.discountAmount);
+    setTotalAmount(totalAmount);
+    setAppliedCouponMessage(
+      `Coupon applied!, saved ₹${totalAmount.discountAmount.toFixed(2)}!`
+    );
+  }, [appliedCoupon, cartItems]);
   const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
@@ -344,6 +375,7 @@ export default function CartsPage() {
                         markedPrice={item.markedPrice}
                         discount={item.discount}
                         restaurantId={item.restaurantId}
+                        addOns={item.addOns}
                       />
                     ))}
                     {cartItems.length === 0 && <View></View>}
@@ -361,18 +393,50 @@ export default function CartsPage() {
                     <View style={styles.summaryRow}>
                       <Text style={styles.summaryText}>Total Savings</Text>
                       <Text style={styles.savingsAmount}>
-                        ₹{getTotalSavings()?.toFixed(2)}
+                        ₹{totalSavings.toFixed(2)}
                       </Text>
                     </View>
-                    <View style={styles.summaryRow}>
+                    {/* <View style={styles.summaryRow}>
                       <Text style={styles.summaryText}>Delivery Charges</Text>
                       <Text style={styles.totalAmount}>₹{25}</Text>
-                    </View>
+                    </View> */}
                     <View style={styles.summaryRow}>
                       <Text style={styles.summaryText}>Total Amount</Text>
                       <Text style={styles.totalAmount}>
-                        ₹{(getTotalAmount() + 20 + 25)?.toFixed(2)}{" "}
+                        ₹{totalAmount.payableAmount.toFixed(2)}{" "}
                       </Text>
+                    </View>
+                    <View style={{ alignItems: "flex-end" }}>
+                      <Button
+                        title={appliedCoupon ? "Change Coupon" : "Apply Coupon"}
+                        type={"clear"}
+                        onPress={() => {
+                          setCouponsModalOpen(!couponsModalOpen);
+                        }}
+                        titleStyle={{
+                          fontSize: 12,
+                          color: theme.colors.primary,
+                          fontFamily: "jakarta-sans-semibold",
+                        }}
+                        buttonStyle={{
+                          paddingHorizontal: 6,
+                          paddingTop: 0,
+                          paddingBottom: 4,
+                        }}
+                        containerStyle={{
+                          borderRadius: 6,
+                        }}
+                      />
+                      {appliedCoupon && (
+                        <Text
+                          style={{
+                            fontFamily: "jakarta-sans-medium",
+                            fontSize: 12,
+                          }}
+                        >
+                          {appliedCouponMessage}
+                        </Text>
+                      )}
                     </View>
                   </Card>
                 </ScrollView>
@@ -463,6 +527,8 @@ export default function CartsPage() {
       )}
 
       <ChangeAddressModal />
+      <ApplyCouponModal />
+      <AddNoteModal />
       {cartItems.length === 0 && (
         <HoverCardOrderInfo
           isVisible={hoverOrderCardVisible}

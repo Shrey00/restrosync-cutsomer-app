@@ -57,7 +57,10 @@ export type CartItem = {
   cuisineType: string;
   discount: number;
   quantity: number;
+  category: number;
+  addOns: { id: string; name: string; sellingPrice: number }[];
 };
+
 export interface CartItemProps {
   id: string;
   menuItemId: string;
@@ -68,6 +71,7 @@ export interface CartItemProps {
   markedPrice: number;
   discount: number;
   quantity: number;
+  addOns: { id: string; name: string; sellingPrice: number }[] | null;
 }
 
 export interface FoodItemProps {
@@ -122,4 +126,22 @@ export interface RestaurantType {
   acceptingOrders: true;
   nextOpeningTime: string; //only to be used for temporary opening and closing of restaurants
   nextClosingTime: string;
+}
+
+export interface Coupon {
+  id: string;
+  name: string;
+  discount: number;
+  freeItem: {
+    name: string;
+    sellingPrice: number;
+  };
+  startTime: string;
+  endTime: string;
+  maxDiscountAmount: number;
+  minOrderValue: number;
+  maxUsage: number;
+  item: string;
+  category: number;
+  couponCode: string;
 }

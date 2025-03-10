@@ -5,8 +5,9 @@ import { Text } from "react-native";
 interface CustomInputProps extends InputProps {
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
-  label?: string,
-  width?: DimensionValue
+  label?: string;
+  width?: DimensionValue;
+  height?: DimensionValue;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
@@ -14,17 +15,19 @@ const CustomInput: React.FC<CustomInputProps> = ({
   rightIcon,
   label,
   width,
+  height,
   ...props
 }) => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const styles = StyleSheet.create({
     inputOuterContainer: {
-      width: width? width : "100%",
+      width: width ? width : "100%",
       margin: 0,
       paddingHorizontal: 0,
       paddingVertical: 8,
     },
     inputInnerContainer: {
+      height: height ? height : 41,
       borderWidth: 0.4,
       borderBottomWidth: 0.4,
       borderColor: theme.colors.grey4,
@@ -34,12 +37,13 @@ const CustomInput: React.FC<CustomInputProps> = ({
       borderRadius: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity:0.02,
+      shadowOpacity: 0.02,
       shadowRadius: 4,
       elevation: 2,
     },
     input: {
       fontSize: 14,
+      height: height ? height : 41,
       fontFamily: "jakarta-sans-regular",
     },
     inputErrorStyle: {
@@ -51,7 +55,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
       fontSize: 13,
       fontWeight: 600,
       marginBottom: 4,
-      color: theme.colors.grey2
+      color: theme.colors.grey2,
     },
   });
   return (

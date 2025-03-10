@@ -7,8 +7,8 @@ type ModalState = {
   addToCartModalOpen: boolean;
   hoverCartInfo: boolean;
   hoverOrderInfo: boolean;
-  //   deliveryNoteModalOpen: boolean;
-  //   couponsModalOpen: boolean;
+  addNoteModalOpen: boolean;
+  couponsModalOpen: boolean;
   //   confirmLogoutModalOpen: boolean;
   //   paymentOptionsModal: boolean;
   setChangeAddressModalOpen: (open: boolean) => void;
@@ -17,8 +17,8 @@ type ModalState = {
   setAddToCartModalOpen: (open: boolean) => void;
   setHoverCartInfo: (open: boolean) => void;
   setHoverOrderInfo: (open: boolean) => void;
-  // setDeliveryNoteModalOpen: (open: boolean) => void;
-  //   setCouponsModalOpen: (open: boolean) => void;
+  setAddNoteModalOpen: (open: boolean) => void;
+  setCouponsModalOpen: (open: boolean) => void;
   //   setConfirmLogoutModalOpen: (open: boolean) => void;
   //   setPaymentOptionsModal: (open: boolean) => void;
 };
@@ -26,7 +26,9 @@ const useModalStore = create<ModalState>((set) => ({
   changeAddressModalOpen: false,
   addAddressModalOpen: false,
   filtersModalOpen: false,
+  couponsModalOpen: false,
   addToCartModalOpen: false,
+  addNoteModalOpen: false,
   hoverCartInfo: false,
   hoverOrderInfo: false,
   setChangeAddressModalOpen: (open) =>
@@ -69,6 +71,20 @@ const useModalStore = create<ModalState>((set) => ({
       return {
         ...state,
         hoverOrderInfo: open,
+      };
+    }),
+  setCouponsModalOpen: (open) =>
+    set((state) => {
+      return {
+        ...state,
+        couponsModalOpen: open,
+      };
+    }),
+  setAddNoteModalOpen: (open) =>
+    set((state) => {
+      return {
+        ...state,
+        addNoteModalOpen: open,
       };
     }),
 }));

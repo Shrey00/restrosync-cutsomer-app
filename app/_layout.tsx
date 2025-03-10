@@ -34,7 +34,6 @@ const theme = createTheme({
     },
   },
 });
-
 async function handleTokenExpiration(
   responseData: any,
   token: string,
@@ -146,6 +145,7 @@ export default function RootLayout() {
         <Stack.Screen name="orders" options={{ headerShown: false }} />
         <Stack.Screen name="order-status" options={{ headerShown: false }} />
         <Stack.Screen name="address" options={{ headerShown: false }} />
+        <Stack.Screen name="food-detail" options={{ headerShown: false }} />
         <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
         <Stack.Screen
           name="profile-settings"

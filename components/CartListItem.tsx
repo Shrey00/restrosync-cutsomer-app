@@ -19,6 +19,7 @@ const CartListItem = ({
   markedPrice,
   discount,
   quantity,
+  addOns,
 }: CartItemProps) => {
   const { theme } = useTheme();
   const modTheme = {
@@ -50,10 +51,23 @@ const CartListItem = ({
       justifyContent: "space-between",
       flexDirection: "row",
       alignItems: "center",
+      width: "100%",
     },
     itemName: {
       fontSize: 13,
       fontFamily: "jakarta-sans-semibold",
+    },
+    addOnHeading: {
+      fontSize: 15,
+      fontFamily: "jakarta-sans-semibold",
+    },
+    addOnText: {
+      fontSize: 12,
+      fontFamily: "jakarta-sans-semibold",
+    },
+    addOnName: {
+      fontSize: 12.2,
+      fontFamily: "jakarta-sans-medium",
     },
     priceContainer: {
       flexDirection: "row",
@@ -114,7 +128,7 @@ const CartListItem = ({
     },
   });
 
-  const handleUpdateQuantity = async (id: string, quanity: number) => {
+  const handleUpdateQuantity = async (id: string) => {
     if (quantity < 1) return;
     const response = await fetch(`${api}/cart/update-quantity`, {
       method: "PATCH",
@@ -144,62 +158,86 @@ const CartListItem = ({
     }
   };
   return (
-    <ListItem key={id} bottomDivider containerStyle={styles.listItem}>
-      <ListItem.Content style={styles.cartItemContainer}>
-        <View>
-          <ListItem.Title style={styles.itemName}>
-            {cuisineType === "veg" ? (
-              <VegIcon width={12} height={12} />
-            ) : (
-              <NonVegIcon width={12} height={12} />
-            )}
-            {"  "}
-            {name}
-          </ListItem.Title>
-          <View style={styles.priceContainer}>
-            <Text style={styles.markedPrice}>₹{markedPrice.toFixed(2)}</Text>
-            <Text style={styles.finalPrice}>₹{sellingPrice.toFixed(2)}</Text>
-            <Text style={styles.discount}>
-              Save ₹{markedPrice - sellingPrice}
-            </Text>
+    <ListItem key={id} containerStyle={styles.listItem}>
+      <ListItem.Content>
+        <View style={styles.cartItemContainer}>
+          <View>
+            <ListItem.Title style={styles.itemName}>
+              {cuisineType === "veg" ? (
+                <VegIcon width={12} height={12} />
+              ) : (
+                <NonVegIcon width={12} height={12} />
+              )}
+              {"  "}
+              {name}
+            </ListItem.Title>
+            <View style={styles.priceContainer}>
+              <Text style={styles.markedPrice}>₹{markedPrice.toFixed(2)}</Text>
+              <Text style={styles.finalPrice}>₹{sellingPrice.toFixed(2)}</Text>
+              <Text style={styles.discount}>
+                Save ₹{markedPrice - sellingPrice}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.buttonsContainer}>
+            <View style={styles.quantityContainer}>
+              <Button
+                icon={
+                  <FontAwesome6
+                    name="minus"
+                    size={12}
+                    color={theme.colors.primary}
+                  />
+                }
+                onPress={() => {
+                  handleUpdateQuantity(id);
+                }}
+                buttonStyle={styles.quantityButtonMinus}
+              />
+              <Text style={styles.quantityText}>{quantity}</Text>
+              <Button
+                icon={
+                  <FontAwesome6
+                    name="plus"
+                    size={12}
+                    color={theme.colors.primary}
+                  />
+                }
+                onPress={() => handleUpdateQuantity(id)}
+                buttonStyle={styles.quantityButtonPlus}
+              />
+            </View>
+            <Pressable onPress={() => handleDeleteCartItem(id)}>
+              <FontAwesome6
+                name="trash-alt"
+                size={16}
+                color={theme.colors.primary}
+              />
+            </Pressable>
           </View>
         </View>
-        <View style={styles.buttonsContainer}>
-          <View style={styles.quantityContainer}>
-            <Button
-              icon={
-                <FontAwesome6
-                  name="minus"
-                  size={12}
-                  color={theme.colors.primary}
-                />
-              }
-              onPress={() => {
-                handleUpdateQuantity(id, --quantity);
-              }}
-              buttonStyle={styles.quantityButtonMinus}
-            />
-            <Text style={styles.quantityText}>{quantity}</Text>
-            <Button
-              icon={
-                <FontAwesome6
-                  name="plus"
-                  size={12}
-                  color={theme.colors.primary}
-                />
-              }
-              onPress={() => handleUpdateQuantity(id, ++quantity)}
-              buttonStyle={styles.quantityButtonPlus}
-            />
+        {addOns && addOns?.length > 0 && (
+          <View style={{ paddingHorizontal: 8, marginTop: -10 }}>
+            <Text style={styles.addOnHeading}>+</Text>
+            {addOns?.map((item: any, index: number) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    // paddingHorizontal: 12,
+                    // width: "45%",
+                  }}
+                >
+                  <Text style={styles.addOnText}>{item.name}</Text>
+                  <Text style={styles.addOnText}> - </Text>
+                  <Text style={styles.addOnText}>₹{item.sellingPrice}</Text>
+                </View>
+              );
+            })}
           </View>
-          <Pressable onPress={() => handleDeleteCartItem(id)}>
-            <FontAwesome6
-              name="trash-alt"
-              size={16}
-              color={theme.colors.primary}
-            />
-          </Pressable>
-        </View>
+        )}
       </ListItem.Content>
     </ListItem>
   );

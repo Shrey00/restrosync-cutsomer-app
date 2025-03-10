@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import useOrderStore from "@/store/orderStore";
+import RatingModal from "@/components/RatingModal";
 export default function Index() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -23,6 +24,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
@@ -102,12 +104,13 @@ export default function Index() {
         cardData={mustTryItems}
         loading={loading}
       />
-      <Categories />
+    <Categories />
       <AddAddressModal />
       <HoverCardOrderInfo
         isVisible={hoverOrderCardVisible}
         setIsVisible={setHoverOrderCardVisible}
       />
+      {/* <RatingModal isOpen={true} setIsOpen={setIsRatingModalOpen}/> */}
     </SafeAreaView>
   );
 }

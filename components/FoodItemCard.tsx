@@ -11,6 +11,10 @@ import useCartStore from "@/store/cartStore";
 import { FoodItemProps } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import { useRouter } from "expo-router";
+import { checkArrayValueEquality } from "../utils";
+import useUserStore from "@/store/userStore";
+import { Link } from "expo-router";
+import { Pressable } from "react-native";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
 const IMAGE_WIDTH = CARD_WIDTH * 0.4;
@@ -33,10 +37,12 @@ export default function FoodItemCard({
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [cartButtonText, setcartButtonText] = useState("Add");
   const router = useRouter();
-  const cartItems = useCartStore((state)=>state.cart);
+  const cartItems = useCartStore((state) => state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
-  const setHoverCartInfo = useCartStore((state)=>state.setCartHoverInfo);
+  const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+  const token = useUserStore((state) => state.user.token);
   // const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
   const setCartModalIsOpen = useModalStore(
     (state) => state.setAddToCartModalOpen
@@ -46,6 +52,29 @@ export default function FoodItemCard({
     const index = event.nativeEvent.contentOffset.x / slideSize;
     setActiveIndex(Math.round(index));
   };
+  const handleUpdateQuantity = async (id: string, quantity: number) => {
+    if (quantity < 1) return;
+    const response = await fetch(`${api}/cart/update-quantity`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ itemId: id, quantity }),
+    });
+    if (response.status === 200) updateQuantity(id, quantity);
+  };
+  function checkExisting(
+    menuItemId: string,
+    addOns: { id: string; name: string; sellingPrice: number }[]
+  ): boolean {
+    //check addons
+    //find id first
+    const item = cartItems.find((item) => item.menuItemId === menuItemId);
+    const foundItemAddons = item ? item.addOns : [];
+    const addOnsEquality = checkArrayValueEquality(foundItemAddons, addOns);
+    return item && addOnsEquality;
+  }
   async function handleAddToCart() {
     if (cartButtonText !== "Add") return;
     if (!(user.token.length > 0)) {
@@ -68,6 +97,19 @@ export default function FoodItemCard({
     } else {
       try {
         setAddToCartLoading(true);
+        const menuItemId = id;
+        const exists = checkExisting(menuItemId, []);
+        const cartItem = cartItems.find(
+          (item) => item.menuItemId === menuItemId
+        );
+
+        if (exists) {
+          handleUpdateQuantity(cartItem?.id!, cartItem?.quantity! + 1);
+          setcartButtonText("Added 🎉");
+          setHoverCardVisble(true);
+          setAddToCartLoading(false);
+          return;
+        }
         const response = await fetch(`${api}/cart/add-to-cart`, {
           method: "POST",
           headers: {
@@ -76,13 +118,13 @@ export default function FoodItemCard({
           },
           body: JSON.stringify({
             menuItemId: id,
+            addOns: [],
           }),
         });
         const responseData = await response.json();
-        console.log(responseData)
         const cartItemParams = {
           id: responseData[0].id,
-          name:name,
+          name: name,
           menuItemId: responseData[0].menuItemId,
           restaurantId,
           markedPrice,
@@ -90,9 +132,10 @@ export default function FoodItemCard({
           cuisineType,
           discount,
           quantity: responseData[0].quantity,
+          addOns: [],
         };
         addToCart(cartItemParams);
-        setHoverCartInfo(cartItemParams, ++cartItems.length)
+        setHoverCartInfo(cartItemParams, ++cartItems.length);
         setcartButtonText("Added 🎉");
         setHoverCardVisble(true);
         setAddToCartLoading(false);
@@ -104,33 +147,38 @@ export default function FoodItemCard({
   return (
     <Card containerStyle={styles.card}>
       <View style={styles.container}>
-        <View style={styles.detailsContainer}>
-          <View style={styles.cuisineInfoContainer}>
-            {cuisineType === "veg" ? (
-              <VegIcon width={18} height={18} />
-            ) : (
-              <NonVegIcon width={18} height={18} />
-            )}
+        <Pressable
+          style={styles.detailsContainer}
+          onPress={() => router.push(`/food-detail?id=${id}`)}
+        >
+          <View>
+            <View style={styles.cuisineInfoContainer}>
+              {cuisineType === "veg" ? (
+                <VegIcon width={18} height={18} />
+              ) : (
+                <NonVegIcon width={18} height={18} />
+              )}
+            </View>
+            <Text style={styles.name}>{name}</Text>
+            <View style={styles.ratingContainer}>
+              <Rating
+                type="star"
+                ratingCount={5.0}
+                fractions={1}
+                imageSize={16}
+                startingValue={rating}
+                readonly={true}
+                showReadOnlyText={false}
+                ratingBackgroundColor="#E8D6AE"
+              />
+              <Text style={styles.ratingText}>10 Ratings</Text>
+            </View>
+            <Text style={styles.price}>{"₹" + sellingPrice}</Text>
+            <Text style={styles.description} numberOfLines={3}>
+              {description}
+            </Text>
           </View>
-          <Text style={styles.name}>{name}</Text>
-          <View style={styles.ratingContainer}>
-            <Rating
-              type="star"
-              ratingCount={5.0}
-              fractions={1}
-              imageSize={16}
-              startingValue={rating}
-              readonly={true}
-              showReadOnlyText={false}
-              ratingBackgroundColor="#E8D6AE"
-            />
-            <Text style={styles.ratingText}>10 Ratings</Text>
-          </View>
-          <Text style={styles.price}>{"₹" + sellingPrice}</Text>
-          <Text style={styles.description} numberOfLines={3}>
-            {description}
-          </Text>
-        </View>
+        </Pressable>
         <View style={styles.imageContainer}>
           <ScrollView
             horizontal

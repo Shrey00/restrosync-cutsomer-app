@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { Coupon } from "../types";
 type NewOrderDetails = {
   address: string;
   orderItems: { quantity: number; addNote: string; menuId: string }[];
@@ -95,6 +95,6 @@ const useOrderStore = create<OrdersState>((set, get) => ({
       );
     });
     return currentOrders;
-  },
+  }
 }));
 export default useOrderStore;
