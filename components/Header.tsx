@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, StyleSheet, Platform, Pressable } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { Text, Button, Avatar } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -132,13 +132,14 @@ const Header = ({
       );
       setLocationText(requiredLocationData);
     })();
-  }, []);
+  }, [setLocation, setLocationText]);
 
   let text = "Waiting..";
   if (locationAccessDenied) {
     text = locationAccessDenied;
   } else if (location) {
     text = JSON.stringify(location);
+    console.log(text);
   }
 
   function handleLocationSetting() {

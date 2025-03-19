@@ -218,7 +218,7 @@ export default function CartsPage() {
         setCartItemsLoading(false);
       }
     })();
-  }, []);
+  }, [setCartItem, user.token]);
   useEffect(() => {
     (async () => {
       const addressResponse = await fetch(`${api}/address/get-addresses`, {
@@ -240,7 +240,7 @@ export default function CartsPage() {
         }
       );
     })();
-  }, [cartItemsLoading]);
+  }, [cartItemsLoading, setAddress, setAllAddresses, setNewOrderDetails, user.token]);
 
   const handleDeleteAllCartItems = async () => {
     const response = await fetch(`${api}/cart/delete-all`, {
@@ -320,7 +320,7 @@ export default function CartsPage() {
     setAppliedCouponMessage(
       `Coupon applied!, saved ₹${totalAmount.discountAmount.toFixed(2)}!`
     );
-  }, [appliedCoupon, cartItems]);
+  }, [appliedCoupon, cartItems, getTotalAmount, getTotalSavings]);
 
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;

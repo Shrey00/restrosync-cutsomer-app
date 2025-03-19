@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
-  Dimensions,
   ScrollView,
   Text,
   Alert,
@@ -10,19 +9,16 @@ import {
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme, Avatar, Card, ListItem, Dialog } from "@rneui/themed";
+import { useTheme, Card, ListItem, Dialog } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 import { deleteKey } from "@/utils";
-import useMenuStore from "../../store/menuStore";
 import useUserStore from "../../store/userStore";
-import { FoodItemProps } from "@/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter, Link } from "expo-router";
 // import {} from 'react-native';
-export default function profile() {
+export default function Profile() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const router = useRouter();
@@ -106,13 +102,15 @@ export default function profile() {
       router.replace("/login");
     }
     setLoading(false);
-  }, []);
+  }, [router, user.token]);
   const toggleLogoutModal = () => {
     setShowLogoutModal(!showLogoutModal);
   };
   const handleLogout = async () => {
+    setDeleteLoading(true);
     await deleteKey("token");
     router.replace("/login");
+    setDeleteLoading(false);
   };
   return (
     <SafeAreaView
