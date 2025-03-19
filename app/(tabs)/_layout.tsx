@@ -1,7 +1,5 @@
 import { Tabs } from "expo-router";
-import { useTheme } from "@rneui/themed";
 import BottomTab from "@/components/BottomTab";
-import useUserStore from "@/store/userStore";
 export default function TabLayout() {
   return (
     <Tabs tabBar={BottomTab}>
@@ -26,7 +24,7 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
-      
+
       <Tabs.Screen
         name="cart"
         options={{

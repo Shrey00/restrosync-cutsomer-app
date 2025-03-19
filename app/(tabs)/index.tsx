@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import SearchBar from "@/components/Search";
 import { ScrollView, StyleSheet } from "react-native";
-import { renderItem } from "@/utils/renderItem";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@rneui/themed";
 import SlideLinkCardSection from "@/components/SlideLinkCardSection";
