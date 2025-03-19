@@ -1,39 +1,23 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-
+import React, { useState, useRef, useEffect } from "react";
 import {
   Modal,
   Animated,
   TouchableOpacity,
   View,
   StyleSheet,
-  ScrollView,
   Pressable,
-  BackHandler,
-  Alert,
 } from "react-native";
-import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
+import { Button, useTheme } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
-import { CartItemProps, FoodItemProps } from "@/types/index";
-import { Rating } from "react-native-ratings";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { api, MAP_API_KEY } from "@/constants/api";
-import CartListItem from "./CartListItem";
 import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import useUserStore from "@/store/userStore";
 import * as Location from "expo-location";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import useCartStore from "@/store/cartStore";
 import CustomInput from "./ui/CustomInput";
 import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
 import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
-import { Skeleton } from "@rneui/base";
-import useOrderStore from "@/store/orderStore";
 import useLocationStore from "@/store/locationStore";
 import SelectDropdown from "react-native-select-dropdown";
 const AddAddressModal = () => {
@@ -175,58 +159,58 @@ const AddAddressModal = () => {
   });
 
   useEffect(() => {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        let location: any;
-        if (status !== "granted") {
-          setLocationAccessDenied("done");
-          return;
-        } else {
-          location = await Location.getCurrentPositionAsync({});
-          setLocationAccessDenied("done");
-        }
-        setLocation(location);
-        const response = await fetch(
-          `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${location.coords.latitude},${location.coords.longitude}&api_key=${MAP_API_KEY}`
-        );
-        const responseData = await response.json();
-        let requiredLocationData = {
-          formattedAddress: "",
-          areaName: "",
-          subLocality: "",
-          neighbourhood: "",
-          city: "",
-          country: "",
-          state: "",
-          postalCode: "",
-        };
-        requiredLocationData.formattedAddress =
-          responseData?.results[0].formatted_address;
-        requiredLocationData.areaName = responseData?.results[0].name;
-        responseData?.results[0].address_components.forEach(
-          (item: any, index: number) => {
-            if (item.types) {
-              for (let i = 0; i < item.types.length; ++i) {
-                if (item.types[i] === "country")
-                  requiredLocationData.country = item.short_name;
-                if (item.types[i] === "administrative_area_level_1")
-                  requiredLocationData.state = item.short_name;
-                if (item.types[i] === "administrative_area_level_2")
-                  requiredLocationData.city = item.short_name;
-                if (item.types[i] === "locality")
-                  requiredLocationData.areaName = item.short_name;
-                if (item.types[i] === "sublocality")
-                  requiredLocationData.subLocality = item.short_name;
-                if (item.types[i] === "neighborhood")
-                  requiredLocationData.neighbourhood = item.short_name;
-                if (item.types[i] === "postal_code")
-                  requiredLocationData.postalCode = item.short_name;
-              }
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      let location: any;
+      if (status !== "granted") {
+        setLocationAccessDenied("done");
+        return;
+      } else {
+        location = await Location.getCurrentPositionAsync({});
+        setLocationAccessDenied("done");
+      }
+      setLocation(location);
+      const response = await fetch(
+        `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${location.coords.latitude},${location.coords.longitude}&api_key=${MAP_API_KEY}`
+      );
+      const responseData = await response.json();
+      let requiredLocationData = {
+        formattedAddress: "",
+        areaName: "",
+        subLocality: "",
+        neighbourhood: "",
+        city: "",
+        country: "",
+        state: "",
+        postalCode: "",
+      };
+      requiredLocationData.formattedAddress =
+        responseData?.results[0].formatted_address;
+      requiredLocationData.areaName = responseData?.results[0].name;
+      responseData?.results[0].address_components.forEach(
+        (item: any, index: number) => {
+          if (item.types) {
+            for (let i = 0; i < item.types.length; ++i) {
+              if (item.types[i] === "country")
+                requiredLocationData.country = item.short_name;
+              if (item.types[i] === "administrative_area_level_1")
+                requiredLocationData.state = item.short_name;
+              if (item.types[i] === "administrative_area_level_2")
+                requiredLocationData.city = item.short_name;
+              if (item.types[i] === "locality")
+                requiredLocationData.areaName = item.short_name;
+              if (item.types[i] === "sublocality")
+                requiredLocationData.subLocality = item.short_name;
+              if (item.types[i] === "neighborhood")
+                requiredLocationData.neighbourhood = item.short_name;
+              if (item.types[i] === "postal_code")
+                requiredLocationData.postalCode = item.short_name;
             }
           }
-        );
-        setLocationText(requiredLocationData);
-      })();
+        }
+      );
+      setLocationText(requiredLocationData);
+    })();
   }, [isOpen]);
 
   const handleRegionChangeComplete = (newRegion: any) => {
@@ -255,7 +239,7 @@ const AddAddressModal = () => {
   };
   const handleAddressFormSubmit = async () => {
     setAddressSubmitLoading(true);
-    const response = await fetch(`${api}/address/add-address`, {
+    await fetch(`${api}/address/add-address`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -318,7 +302,12 @@ const AddAddressModal = () => {
     }
   }, [addressDetailsFormData]);
   return (
-    <Modal transparent visible={isOpen} animationType="none">
+    <Modal
+      transparent
+      visible={isOpen}
+      animationType="none"
+      onRequestClose={() => setIsOpen(false)}
+    >
       <View style={styles.modalOverlay}>
         <Animated.View
           style={[
@@ -450,6 +439,7 @@ const AddAddressModal = () => {
                     renderItem={(item, index, isSelected) => {
                       return (
                         <View
+                          aria-label={item.label}
                           style={{
                             paddingTop: 6,
                             paddingBottom: 6,

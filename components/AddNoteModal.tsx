@@ -8,30 +8,20 @@ import {
   TextInput,
   ToastAndroid,
 } from "react-native";
-import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
-import { Icon, Text, Skeleton } from "@rneui/themed";
-import { CartItemProps, FoodItemProps } from "@/types/index";
-import { Rating } from "react-native-ratings";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
-import { api } from "@/constants/api";
+import { Button, useTheme } from "@rneui/themed";
+import { Icon, Text } from "@rneui/themed";
 import useUserStore from "@/store/userStore";
+import useOrderStore from "@/store/orderStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import useCartStore from "@/store/cartStore";
-import { VariantsData } from "@/types";
 import useModalStore from "@/store/modalsStore";
-import { checkArrayValueEquality } from "../utils";
-import { restaurantId } from "@/constants/restaurantInfo";
-import CustomInput from "./ui/CustomInput";
 const AddNoteModal = () => {
   const isOpen = useModalStore((state) => state.addNoteModalOpen);
   const setIsOpen = useModalStore((state) => state.setAddNoteModalOpen);
-  const slideAnim = useRef(new Animated.Value(380)).current; // Initial position of modal (offscreen)
-  const [addToCartLoading, setAddToCartLoading] = useState(false);
-  const [cartButtonText, setcartButtonText] = useState("Add");
+  const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
   const { theme } = useTheme();
   const IMAGE_WIDTH = 70;
-  const user = useUserStore((state) => state.user);
+  const setDeliveryNote = useOrderStore((state) => state.setDeliveryNote);
+  const deliveryNote = useOrderStore((state) => state.deliveryNote);
   function handleAddNote() {
     showToast("Note added successfully");
     setIsOpen(false);
@@ -46,7 +36,7 @@ const AddNoteModal = () => {
 
   const closeModal = () => {
     Animated.timing(slideAnim, {
-      toValue: 380, // Slide back down
+      toValue: 600, // Slide back down
       duration: 120,
       useNativeDriver: true,
     }).start(() => setIsOpen(false));
@@ -173,6 +163,10 @@ const AddNoteModal = () => {
               multiline
               textAlignVertical="top"
               placeholder="Add a note for the delivery partner"
+              value={deliveryNote}
+              onChangeText={(text) => {
+                setDeliveryNote(text);
+              }}
               style={{
                 height: 120,
                 borderWidth: 0.6,
@@ -200,8 +194,7 @@ const AddNoteModal = () => {
                 style={{ marginRight: 6 }}
               />
             }
-            loading={addToCartLoading}
-            title={cartButtonText}
+            title={"Add note"}
             titleStyle={styles.cartButtonTitle}
             buttonStyle={styles.cartButton}
             containerStyle={styles.cartButtonContainer}

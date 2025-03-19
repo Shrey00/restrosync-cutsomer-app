@@ -28,8 +28,8 @@ const theme = createTheme({
       titleStyle: { color: "#FFCDD2", fontSize: 14 },
       buttonStyle: {
         borderRadius: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
+        paddingHorizontal: 20,
+        paddingVertical: 11.5,
       },
     },
   },
@@ -112,8 +112,6 @@ export default function RootLayout() {
             setUser({ ...userData, token });
             setLoadingUser(false);
           } else if (!responseData.statusCode) {
-            console.log("HERE THAT IS");
-            console.log(responseData);
             const userData = responseData.data[0];
             setUser({ ...userData, token });
             setLoadingUser(false);
@@ -146,7 +144,10 @@ export default function RootLayout() {
         <Stack.Screen name="order-status" options={{ headerShown: false }} />
         <Stack.Screen name="address" options={{ headerShown: false }} />
         <Stack.Screen name="food-detail" options={{ headerShown: false }} />
-        <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="terms-conditions"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="profile-settings"
           options={{ headerShown: false }}

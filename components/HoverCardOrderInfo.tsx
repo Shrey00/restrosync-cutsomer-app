@@ -1,7 +1,6 @@
 import { View, Text, Animated, StyleSheet } from "react-native";
 import React, { useRef } from "react";
-import { Card, Button, useTheme } from "@rneui/themed";
-import useCartStore from "@/store/cartStore";
+import { Button, useTheme } from "@rneui/themed";
 import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -45,7 +44,7 @@ const HoverCardOrderInfo = ({
   });
   if (isVisible) {
     Animated.timing(slideAnim, {
-      toValue: 0, // Slide to view
+      toValue: 8, // Slide to view
       duration: 120,
       useNativeDriver: true,
     }).start();
@@ -88,7 +87,7 @@ const HoverCardOrderInfo = ({
               <Text
                 style={{
                   fontFamily: "jakarta-sans-medium",
-                  fontSize: 12,
+                  fontSize: 11.8,
                   width: "90%",
                 }}
               >

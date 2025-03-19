@@ -87,7 +87,7 @@ const useCartStore = create<CartState>((set, get) => ({
   getTotalAmount: () => {
     const { cart, getDiscountAmount } = get();
     let totalAmount = 0;
-    console.log("Cart Store ~ ",cart.length)
+    console.log("Cart Store ~ ", cart.length);
     cart?.forEach((item) => {
       let addOnAmount = 0;
       let itemAmount = item.sellingPrice * item.quantity;

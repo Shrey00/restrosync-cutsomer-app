@@ -177,7 +177,11 @@ export default function profile() {
             {user.email && (
               <CustomInput
                 placeholder="E-mail"
-                disabledInputStyle={{ opacity: 1, color: theme.colors.grey1,lineHeight:16 }}
+                disabledInputStyle={{
+                  opacity: 1,
+                  color: theme.colors.grey1,
+                  lineHeight: 16,
+                }}
                 disabled
                 leftIcon={
                   <AntDesign
@@ -192,7 +196,11 @@ export default function profile() {
             <CustomInput
               placeholder="Phone"
               // inputContainerStyle={{ borderWidth:1, borderColor:theme.colors.primary }}
-              disabledInputStyle={{ opacity: 1, color: theme.colors.grey1,lineHeight:16 }}
+              disabledInputStyle={{
+                opacity: 1,
+                color: theme.colors.grey1,
+                lineHeight: 16,
+              }}
               disabled
               leftIcon={
                 <AntDesign

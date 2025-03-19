@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { useRouter, Href } from "expo-router";
-import useOrderStore from "@/store/orderStore";
 const OrderItemDropdown = ({ id }: { id: string }) => {
   const [visible, setVisible] = useState(false);
   const router = useRouter();

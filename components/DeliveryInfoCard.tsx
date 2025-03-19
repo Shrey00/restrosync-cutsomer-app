@@ -1,23 +1,15 @@
-import React, { useEffect, useState } from "react";
 import {
-  Platform,
   View,
-  ScrollView,
   StyleSheet,
-  Pressable,
 } from "react-native";
 import { Card } from "@rneui/themed";
-import Header from "@/components/Header";
 import { Text, Button } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
-import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Feather from "@expo/vector-icons/Feather";
-import Entypo from "@expo/vector-icons/Entypo";
-import { api } from "@/constants/api";
 import useModalStore from "@/store/modalsStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
@@ -57,12 +49,10 @@ const DeliveryInfoCard = ({
   function handleChangeAddressButton() {
     setChangeAddressModalOpen(true);
   }
-  const setAddress = useAddressStore((state) => state.setAddress);
-  const allAddresses = useAddressStore((state) => state.allAddresses);
   const user = useUserStore((state) => state.user);
   const address = useAddressStore((state) => state.address);
-  const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
-  const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
+  const deliveryNote = useOrderStore((state) => state.deliveryNote);
+  const setDeliveryNote = useOrderStore((state) => state.setDeliveryNote);
   const setAddNoteModalOpen = useModalStore(
     (state) => state.setAddNoteModalOpen
   );
@@ -105,13 +95,15 @@ const DeliveryInfoCard = ({
             <Button
               icon={
                 <AntDesign
-                  name="plus"
+                  name={deliveryNote.length ? "close" : "plus"}
                   size={14}
                   color={theme.colors.primary}
                   style={{ marginRight: 1 }}
                 />
               }
-              title={"Add note for delivery partner"}
+              title={
+                deliveryNote.length ? "Remove" : "Add note for delivery partner"
+              }
               type={"outline"}
               titleStyle={{ fontSize: 12, color: theme.colors.primary }}
               buttonStyle={{
@@ -119,8 +111,12 @@ const DeliveryInfoCard = ({
                 paddingVertical: 2,
                 borderWidth: 0.6,
               }}
-              containerStyle={{ marginTop: 6 }}
-              onPress={handleAddNoteModal}
+              containerStyle={{ marginTop: 6, borderRadius: 8 }}
+              onPress={
+                deliveryNote.length
+                  ? () => setDeliveryNote("")
+                  : handleAddNoteModal
+              }
             />
             <Button
               icon={
@@ -155,7 +151,7 @@ const DeliveryInfoCard = ({
                 paddingVertical: 2,
                 borderWidth: 0.6,
               }}
-              containerStyle={{ marginTop: 6 }}
+              containerStyle={{ marginTop: 6, borderRadius: 8 }}
               onPress={handleChangeAddressButton}
             />
           </View>

@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@rneui/themed";
 import SlideLinkCardSection from "@/components/SlideLinkCardSection";
 import CustomInput from "@/components/ui/CustomInput";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "@rneui/themed";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -30,6 +30,7 @@ const LoginScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [verifyOtpLoading, setVerifyOtpLoading] = useState(false);
+  const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const handleLogin = async () => {
     if (useOtp) {
@@ -110,6 +111,11 @@ const LoginScreen = () => {
       setWarningText("OTP didn't match");
     }
   };
+  useEffect(() => {
+    if (user.token) {
+      router.replace("/(tabs)");
+    }
+  }, []);
   return (
     <View style={styles.container}>
       {!useOtp ? (
@@ -218,7 +224,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 16,
-    paddingVertical: 10,
+    paddingVertical: 14,
   },
   otpText: {
     fontSize: 16,

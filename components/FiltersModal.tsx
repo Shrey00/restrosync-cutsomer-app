@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-
 import {
   Modal,
   Animated,
@@ -8,33 +6,14 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Pressable,
-  BackHandler,
-  Alert,
 } from "react-native";
-import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
+import { Card, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
-import { CartItemProps, FoodItemProps } from "@/types/index";
-import { Rating } from "react-native-ratings";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { api, MAP_API_KEY } from "@/constants/api";
-import CartListItem from "./CartListItem";
-import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import useUserStore from "@/store/userStore";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import useCartStore from "@/store/cartStore";
-import CustomInput from "./ui/CustomInput";
-import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import useMenuStore from "@/store/menuStore";
-import { Skeleton } from "@rneui/base";
-import useOrderStore from "@/store/orderStore";
-import useLocationStore from "@/store/locationStore";
-import SelectDropdown from "react-native-select-dropdown";
 const FiltersModal = () => {
   const { theme } = useTheme();
   const isOpen = useModalStore((state) => state.filtersModalOpen);
@@ -281,7 +260,7 @@ const FiltersModal = () => {
                           onPress={() => setSelectSortByFilter(index)}
                           checkedIcon="dot-circle-o"
                           uncheckedIcon="circle-o"
-                          size={24}
+                          size={26}
                           containerStyle={{
                             paddingBottom: 0,
                             marginBottom: 0,
@@ -329,7 +308,7 @@ const FiltersModal = () => {
                           onPress={() => setSelectRatingFilter(index)}
                           checkedIcon="dot-circle-o"
                           uncheckedIcon="circle-o"
-                          size={24}
+                          size={26}
                           containerStyle={{
                             paddingBottom: 0,
                             marginBottom: 0,
@@ -396,7 +375,7 @@ const FiltersModal = () => {
                           onPress={() => setSelectDietFilter(index)}
                           checkedIcon="dot-circle-o"
                           uncheckedIcon="circle-o"
-                          size={24}
+                          size={26}
                           containerStyle={{
                             paddingBottom: 0,
                             marginBottom: 0,

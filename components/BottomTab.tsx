@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useTheme } from "@rneui/themed";
 const BottomTab: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,

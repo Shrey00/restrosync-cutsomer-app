@@ -36,7 +36,7 @@ const HoverCardCartInfo = ({
       shadowRadius: 4,
       elevation: 1,
       backgroundColor: "#FEFEFE",
-      bottom: hoverOrderCardVisible ? 80 : 0,
+      bottom: hoverOrderCardVisible ? 95 : 0,
       left: 0,
       right: 0,
       borderWidth: 0.8,
@@ -45,7 +45,7 @@ const HoverCardCartInfo = ({
   });
   if (isVisible) {
     Animated.timing(slideAnim, {
-      toValue: 0, // Slide to view
+      toValue: 8, // Slide to view
       duration: 120,
       useNativeDriver: true,
     }).start();

@@ -11,8 +11,6 @@ import { MAP_API_KEY } from "@/constants/api";
 import * as Location from "expo-location";
 import useLocationStore from "@/store/locationStore";
 import useModalStore from "@/store/modalsStore";
-import AddAddressModal from "./AddAddressModal";
-import ItemOptionsOverlay from "./ItemOptionsOverlay";
 const Header = ({
   user,
   showSearch,

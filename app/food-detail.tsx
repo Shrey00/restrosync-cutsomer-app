@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Platform, View, ScrollView, StyleSheet } from "react-native";
+import {
+  Platform,
+  View,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { Card } from "@rneui/themed";
 import Header from "@/components/Header";
 import { Text, Button, Skeleton } from "@rneui/themed";
@@ -19,18 +26,21 @@ import useUserStore from "../store/userStore";
 import useCartStore from "../store/cartStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
+import useModalStore from "@/store/modalsStore";
+import useMenuStore from "@/store/menuStore";
 import { CartItem } from "@/types";
 import { Link } from "expo-router";
-import useModalStore from "@/store/modalsStore";
 import { AddressType } from "../types";
 import { useRouter, Redirect } from "expo-router";
 import { restaurantId } from "@/constants/restaurantInfo";
 import { Image } from "@rneui/themed";
 import { useLocalSearchParams } from "expo-router";
-import useMenuStore from "@/store/menuStore";
 import { FoodItemProps } from "@/types";
-import AddToCartModal from "@/components/AddToCartModal";
 import { checkArrayValueEquality } from "@/utils";
+import AddToCartModal from "@/components/AddToCartModal";
+import VegIcon from "../assets/veg-icon.svg";
+import NonVegIcon from "../assets/non-veg-icon.svg";
+import { Rating } from "react-native-ratings";
 export default function CartsPage() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams();
@@ -47,23 +57,19 @@ export default function CartsPage() {
       error: "#F44336",
     },
   };
-
+  const { width } = Dimensions.get("window");
   const styles = StyleSheet.create({
     container: {
       flex: 1,
+      justifyContent: "space-between",
+      backgroundColor: theme.colors.background,
     },
-    imageContainer: {
-      // width: IMAGE_WIDTH,
-      height: "38%",
-      borderTopRightRadius: 10,
-      borderBottomRightRadius: 10,
-      overflow: "hidden",
-    },
+    imageContainer: {},
     image: {
-      width: 800,
-      height: 500,
-      borderTopRightRadius: 10,
-      borderBottomRightRadius: 10,
+      width: width,
+      height: 280,
+      // borderTopRightRadius: 10,
+      // borderBottomRightRadius: 10,
     },
     name: {
       fontFamily: "jakarta-sans-semibold",
@@ -113,7 +119,18 @@ export default function CartsPage() {
     cartButtonContainer: {
       borderRadius: 4,
       paddingVertical: 8,
-      width: "100%",
+      // width: "100%",
+      marginHorizontal: 10,
+    },
+    ratingContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginVertical: 10,
+    },
+    ratingText: {
+      marginLeft: 5,
+      fontSize: 12,
+      fontFamily: "jakarta-sans-medium",
     },
   });
 
@@ -157,6 +174,7 @@ export default function CartsPage() {
   const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const [cartButtonText, setcartButtonText] = useState("Add");
+  const [menuItemDataLoading, setMenuItemDataLoading] = useState(true);
   const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
     id: "",
     name: "",
@@ -178,7 +196,7 @@ export default function CartsPage() {
   const setCartModalIsOpen = useModalStore(
     (state) => state.setAddToCartModalOpen
   );
-  const menuItem = getMenuItem(id as string);
+  // const menuItemData = getMenuItem(id as string);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
@@ -203,7 +221,8 @@ export default function CartsPage() {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch(`${api}/item`, {
+      setMenuItemDataLoading(true);
+      const response = await fetch(`${api}/menu/item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -211,8 +230,8 @@ export default function CartsPage() {
         body: JSON.stringify({ menuItemId: id }),
       });
       const data = await response.json();
-      console.log(data);
-      //   setMenuItemData(data)
+      setMenuItemData(data[0]);
+      setMenuItemDataLoading(false);
     })();
   }, []);
 
@@ -282,15 +301,16 @@ export default function CartsPage() {
         });
         const responseData = await response.json();
         const cartItemParams = {
-          id: responseData[0].id,
-          name: menuItem?.name!,
-          menuItemId: responseData[0].menuItemId,
+          id: responseData[0].id as string,
+          name: menuItemData?.name!,
+          menuItemId: responseData[0].menuItemId as string,
           restaurantId,
-          markedPrice: menuItem?.markedPrice!,
+          markedPrice: menuItemData?.markedPrice!,
           sellingPrice: responseData[0].finalPrice!,
-          cuisineType: menuItem?.cuisineType!,
-          discount: menuItem?.discount!,
-          quantity: responseData[0].quantity!,
+          cuisineType: menuItemData?.cuisineType! as string,
+          discount: menuItemData?.discount! as number,
+          quantity: responseData[0].quantity! as number,
+          // category: menuItemData?.category!,
           addOns: [],
         };
         addToCart(cartItemParams);
@@ -309,60 +329,135 @@ export default function CartsPage() {
   ];
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.imageContainer}>
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
+      <View>
+        <Pressable
+          style={{
+            marginLeft: 12,
+            marginBottom: 12,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => {
+            router.back();
+          }}
         >
-          {images?.map((image, index) => (
-            <Image
-              key={index}
-              source={{
-                uri: image,
-              }}
-              style={styles.image}
-              PlaceholderContent={<Text>Loading...</Text>}
+          <Entypo
+            name="chevron-thin-left"
+            size={24}
+            color={theme.colors.primary}
+          />
+          <Text
+            style={{
+              fontFamily: "jakarta-sans-medium",
+              fontSize: 20,
+              color: theme.colors.primary,
+              marginBottom: 4,
+              marginLeft: 2,
+            }}
+          >
+            Back
+          </Text>
+        </Pressable>
+        {menuItemDataLoading ? (
+          <View style={styles.skeletonContainer}>
+            <Skeleton
+              animation="pulse"
+              height={280}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
             />
-          ))}
-        </ScrollView>
-        <View style={styles.pagination}>
-          {images?.map((_, index) => (
+            <Skeleton
+              animation="pulse"
+              height={40}
+              style={styles.skeletonStructure}
+              skeletonStyle={{...styles.skeleton, marginLeft: 10, borderRadius: 6, width:240}}
+            />
+            <Skeleton
+              animation="pulse"
+              height={95}
+              style={styles.skeletonStructure}
+              skeletonStyle={{...styles.skeleton, marginHorizontal: 10, borderRadius: 6, width:'95%'}}
+            />
+          </View>
+        ) : (
+          <View>
+            <View>
+              <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+              >
+                {menuItemData.images?.map((image, index) => (
+                  <Image
+                    key={index}
+                    source={{
+                      uri: image,
+                    }}
+                    style={styles.image}
+                    PlaceholderContent={<Text>Loading...</Text>}
+                  />
+                ))}
+              </ScrollView>
+              <View style={styles.pagination}>
+                {menuItemData.images?.map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.paginationDot,
+                      index === activeIndex ? styles.paginationDotActive : null,
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
             <View
-              key={index}
-              style={[
-                styles.paginationDot,
-                index === activeIndex ? styles.paginationDotActive : null,
-              ]}
-            />
-          ))}
-        </View>
+              style={{
+                margin: 10,
+                // flexDirection: "column",
+                // justifyContent: "space-between",
+              }}
+            >
+              <View>
+                <Text style={styles.name}>{menuItemData?.name}</Text>
+                <Text style={styles.description}>
+                  {menuItemData?.description}
+                </Text>
+                <View style={styles.ratingContainer}>
+                  <Rating
+                    type="star"
+                    ratingCount={5.0}
+                    fractions={1}
+                    imageSize={24}
+                    startingValue={menuItemData?.rating}
+                    readonly={true}
+                    showReadOnlyText={false}
+                    ratingBackgroundColor="#E8D6AE"
+                  />
+                  {/* <Text style={styles.ratingText}>10 Ratings</Text> */}
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
-      <View style={{ margin: 10 }}>
-        <Text style={styles.name}>{menuItem?.name}</Text>
-        <Text style={styles.description}>
-            {menuItem?.description}
-        </Text>
-        
-        <Button
-          icon={
-            <FontAwesome6
-              name="plus"
-              size={16}
-              color="#FDE4E8"
-              style={{ marginRight: 6 }}
-            />
-          }
-          loading={addToCartLoading}
-          title={cartButtonText}
-          titleStyle={styles.cartButtonTitle}
-          buttonStyle={styles.cartButton}
-          containerStyle={styles.cartButtonContainer}
-          onPress={handleAddToCart}
-        />
-      </View>
+      <Button
+        icon={
+          <FontAwesome6
+            name="plus"
+            size={16}
+            color="#FDE4E8"
+            style={{ marginRight: 6 }}
+          />
+        }
+        loading={addToCartLoading}
+        title={cartButtonText}
+        titleStyle={styles.cartButtonTitle}
+        buttonStyle={styles.cartButton}
+        containerStyle={styles.cartButtonContainer}
+        onPress={handleAddToCart}
+      />
       <AddToCartModal menuItemData={menuItemData} />
     </SafeAreaView>
   );

@@ -7,128 +7,15 @@ import {
   StyleSheet,
   ScrollView,
   ToastAndroid,
-  StatusBar,
-  Pressable,
 } from "react-native";
-import { Card, Button, useTheme, Badge, ListItem } from "@rneui/themed";
+import { Button, useTheme, ListItem } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
 import { Coupon } from "@/types";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
 import { api } from "@/constants/api";
-import CartListItem from "./CartListItem";
-import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import useUserStore from "@/store/userStore";
-import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import { Skeleton } from "@rneui/base";
-import useOrderStore from "@/store/orderStore";
-import useAddressStore from "@/store/addressStore";
 import useCartStore from "@/store/cartStore";
-const AddressList = ({
-  allAddresses,
-}: {
-  allAddresses: AddressType[] | [];
-}) => {
-  const { theme } = useTheme();
-  const { token } = useUserStore((state) => state.user);
-  const styles = StyleSheet.create({
-    addressText: {
-      fontFamily: "jakarta-sans-medium",
-      color: theme.colors.grey0,
-      fontSize: 12.5,
-    },
-  });
-  const address = useAddressStore((state) => state.address);
-  const setAddress = useAddressStore((state) => state.setAddress);
-  const orderDetails = useOrderStore((state) => state.newOrderDetails);
-  const setOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
-  async function handleSelectAddress(address: AddressType) {
-    const response = await fetch(`${api}/address/asdfasdfasdf`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ addressId: address.id }),
-    });
-    const responseData = await response.json();
-    if (responseData.data) {
-      setAddress(address);
-      setOrderDetails({ address: address.id });
-    }
-  }
-
-  return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
-      {allAddresses?.map((item, index) => {
-        return (
-          <Card
-            key={index}
-            containerStyle={{
-              marginHorizontal: 0,
-              borderRadius: 8,
-              marginVertical: 8,
-            }}
-          >
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <Text
-                style={{
-                  fontFamily: "jakarta-sans-medium",
-                  fontSize: 14,
-                  color: theme.colors.primary,
-                }}
-              >
-                {item.type === "Home" && (
-                  <AntDesign
-                    name="home"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                )}
-                {item.type === "Office" && (
-                  <Feather
-                    name="briefcase"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                )}
-                {"  "}
-                {item.type}
-              </Text>
-              <Button
-                disabled={address.id === item.id ? true : false}
-                title={address.id === item.id ? "selected" : "select"}
-                type="outline"
-                containerStyle={{ borderColor: theme.colors.primary }}
-                buttonStyle={{
-                  paddingHorizontal: 8,
-                  paddingBottom: 4,
-                  paddingTop: 3,
-                  borderWidth: 0.6,
-                }}
-                titleStyle={{ color: theme.colors.primary }}
-                onPress={() => handleSelectAddress(item)}
-              />
-            </View>
-            <View style={{ marginTop: 6 }}>
-              <Text style={styles.addressText}>
-                {item.address_line_1}, {item.address_line_2}
-              </Text>
-              <Text style={styles.addressText}>
-                {item.state}, {item.city}
-              </Text>
-            </View>
-          </Card>
-        );
-      })}
-    </ScrollView>
-  );
-};
 const ApplyCouponModal = () => {
   const { theme } = useTheme();
   const isOpen = useModalStore((state) => state.couponsModalOpen);
@@ -136,16 +23,7 @@ const ApplyCouponModal = () => {
   const appliedCoupon = useCartStore((state) => state.appliedCoupon);
   const setAppliedCoupon = useCartStore((state) => state.setAppliedCoupon);
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
-  const couponDiscountAmount = useCartStore(
-    (state) => state.couponDiscountAmount
-  );
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
-  const setChangeAddressModalOpen = useModalStore(
-    (state) => state.setChangeAddressModalOpen
-  );
-  const setAddAddressModalOpen = useModalStore(
-    (state) => state.setAddAddressModalOpen
-  );
   const [activeCouponsList, setActiveCouponsList] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const user = useUserStore((state) => state.user);
@@ -307,9 +185,6 @@ const ApplyCouponModal = () => {
 
   useEffect(() => {
     const totalAmount = getTotalAmount();
-    console.log("HEY", getTotalAmount());
-    console.log("BOI", appliedCoupon?.couponCode);
-    console.log("----------------------------------");
     if (appliedCoupon === undefined) {
       showToast("This coupon is not valid for this order");
     } else if (appliedCoupon && totalAmount.discountAmount > 0) {

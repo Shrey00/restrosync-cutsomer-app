@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Platform, View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { Card } from "@rneui/themed";
 import Header from "@/components/Header";
 import { Text, Button, Skeleton } from "@rneui/themed";
@@ -7,8 +7,6 @@ import { useTheme } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OrderSuccessMessage from "@/components/OrderSuccessMessage";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import CartListItem from "@/components/CartListItem";
@@ -23,7 +21,7 @@ import useOrderStore from "@/store/orderStore";
 import { Link } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import { AddressType } from "../../types";
-import { useRouter, Redirect } from "expo-router";
+import { Redirect } from "expo-router";
 export default function CartsPage() {
   const { theme } = useTheme();
   const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
@@ -106,7 +104,6 @@ export default function CartsPage() {
     checkoutButton: {
       backgroundColor: modTheme.colors.primary,
       paddingVertical: 12,
-      // marginVertical: 8,
     },
     checkoutButtonTitle: {
       fontSize: 16,
@@ -160,9 +157,7 @@ export default function CartsPage() {
     },
   ];
   const user: any = useUserStore((state) => state.user);
-  const router = useRouter();
   const cartItems = useCartStore((state) => state.cart);
-  const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
   const getTotalSavings = useCartStore((state) => state.getTotalSavings);
   const setCartItem = useCartStore((state) => state.setCartItem);
@@ -191,6 +186,7 @@ export default function CartsPage() {
   const [totalSavings, setTotalSavings] = useState(0);
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
+  const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
@@ -202,14 +198,7 @@ export default function CartsPage() {
     (state) => state.setHoverOrderInfo
   );
   const setOrders = useOrderStore((state) => state.setOrders);
-  if (!(user.token.length > 0)) {
-    return <Redirect href={"/login"} />;
-  }
-  // if (appliedCoupon) {
-  // }
-  // useEffect(() => {
-  //   console.log("HEY THIS IS APPLIED COUPON", appliedCoupon);
-  // }, [appliedCoupon]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -225,6 +214,8 @@ export default function CartsPage() {
         setCartItemsLoading(false);
       } catch (e) {
         console.log(e);
+      } finally {
+        setCartItemsLoading(false);
       }
     })();
   }, []);
@@ -285,11 +276,12 @@ export default function CartsPage() {
           return {
             quantity: item.quantity,
             menuId: item.menuItemId,
-            addNote: "",
+            addOns: item.addOns,
           };
         });
         const createOrder = {
           ...newOrderDetails,
+          appliedCoupon,
         };
         createOrder.orderItems = orderItems;
         const response = await fetch(`${api}/orders/place-order`, {
@@ -309,7 +301,6 @@ export default function CartsPage() {
           setCartItem([]);
           setTimeout(() => {
             setOrderSuccessVisible(false);
-            // router.push("/orders/order-status")
           }, 1200);
         }
         setLoadingPlaceOrder(false);
@@ -321,7 +312,6 @@ export default function CartsPage() {
       setChangeAddressModalOpen(true);
     }
   };
-
   useEffect(() => {
     const totalAmount = getTotalAmount();
     const totalSavings = getTotalSavings();
@@ -331,7 +321,10 @@ export default function CartsPage() {
       `Coupon applied!, saved ₹${totalAmount.discountAmount.toFixed(2)}!`
     );
   }, [appliedCoupon, cartItems]);
-  const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
+
+  if (!(user.token.length > 0)) {
+    return <Redirect href={"/login"} />;
+  }
   return (
     <SafeAreaView style={styles.container}>
       {orderSuccessVisible ? (

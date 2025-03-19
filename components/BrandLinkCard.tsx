@@ -1,10 +1,6 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Card } from "@rneui/themed";
 
-import { useState } from "react";
-import { ActivityIndicator, Animated } from "react-native";
-import { Button } from "@rneui/themed";
-
 const BrandLinkCard = ({
   imageSource,
   title,

@@ -13,7 +13,6 @@ import useModalStore from "@/store/modalsStore";
 import { useRouter } from "expo-router";
 import { checkArrayValueEquality } from "../utils";
 import useUserStore from "@/store/userStore";
-import { Link } from "expo-router";
 import { Pressable } from "react-native";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
@@ -171,7 +170,7 @@ export default function FoodItemCard({
                 showReadOnlyText={false}
                 ratingBackgroundColor="#E8D6AE"
               />
-              <Text style={styles.ratingText}>10 Ratings</Text>
+              {/* <Text style={styles.ratingText}>10 Ratings</Text> */}
             </View>
             <Text style={styles.price}>{"₹" + sellingPrice}</Text>
             <Text style={styles.description} numberOfLines={3}>
@@ -194,6 +193,7 @@ export default function FoodItemCard({
                   uri: image,
                 }}
                 style={styles.image}
+                aria-label={"image of " + name}
                 PlaceholderContent={<Text>Loading...</Text>}
               />
             ))}
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 24,
     width: IMAGE_WIDTH,
-    height: 38,
+    height: 45,
   },
   buttonTitle: {
     fontFamily: "jakarta-sans-semibold",

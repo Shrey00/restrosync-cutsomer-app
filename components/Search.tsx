@@ -1,12 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 import { Input } from "@rneui/themed";
-import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useTheme } from "@rneui/themed";
 import { useRouter, useSegments } from "expo-router";
-import { api } from "../constants/api";
-import useMenuStore from "@/store/menuStore";
 import useModalStore from "@/store/modalsStore";
 import useOrderStore from "@/store/orderStore";
 const SearchBar = ({

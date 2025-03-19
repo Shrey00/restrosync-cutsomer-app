@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text, Skeleton } from "@rneui/themed";
-import { CartItemProps, FoodItemProps } from "@/types/index";
+import { FoodItemProps } from "@/types/index";
 import { Rating } from "react-native-ratings";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
@@ -20,7 +20,6 @@ import useCartStore from "@/store/cartStore";
 import { VariantsData } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import { checkArrayValueEquality } from "../utils";
-import { restaurantId } from "@/constants/restaurantInfo";
 const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   const isOpen = useModalStore((state) => state.addToCartModalOpen);
   const setIsOpen = useModalStore((state) => state.setAddToCartModalOpen);
@@ -28,7 +27,6 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedIndex, setIndex] = React.useState(0);
   const [addOnCheckedIndex, setAddOnCheckedIndex] = useState<any>({});
-  const [variantsData, setVariantsData] = useState<VariantsData[]>([]);
   const [variantsDataLoading, setVariantsDataLoading] = useState(true);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [cartButtonText, setcartButtonText] = useState("Add");

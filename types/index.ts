@@ -57,7 +57,6 @@ export type CartItem = {
   cuisineType: string;
   discount: number;
   quantity: number;
-  category: number;
   addOns: { id: string; name: string; sellingPrice: number }[];
 };
 
@@ -133,6 +132,7 @@ export interface Coupon {
   name: string;
   discount: number;
   freeItem: {
+    id: string;
     name: string;
     sellingPrice: number;
   };

@@ -4,7 +4,6 @@ import React from "react";
 import { ListItem, Text, Button, Icon, Divider } from "@rneui/themed";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useCartStore from "@/store/cartStore";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import { CartItemProps } from "@/types/index";

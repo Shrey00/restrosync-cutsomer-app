@@ -1,7 +1,6 @@
 import React from "react";
 import OfferLinkCard from "@/components/OfferLinkCard";
 import BrandLinkCard from "@/components/BrandLinkCard";
-import { RestaurantType, MenuItem } from "@/types";
 import { View, Text, Pressable } from "react-native";
 import { ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "@rneui/themed";
@@ -16,7 +15,7 @@ const SlideLinkCardSection = ({
   loading,
 }: {
   heading: string;
-  link: { text: string; link: Href<string | object> };
+  link: { text: string; link: Href };
   cardData: any[];
   sectionType: "popular" | "brands";
   loading: boolean;
@@ -116,7 +115,7 @@ const SlideLinkCardSection = ({
                   </Pressable>
                 )}
                 {sectionType === "popular" && (
-                  <Link key={index} href="/menu">
+                  <Link key={index} href={`/food-detail?id=${item.id}`}>
                     <OfferLinkCard
                       imageSource={{ uri: item.images[0] }}
                       title={item.name}

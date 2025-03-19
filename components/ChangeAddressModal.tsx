@@ -10,18 +10,12 @@ import {
 } from "react-native";
 import { Card, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
-import { CartItemProps, FoodItemProps } from "@/types/index";
-import { Rating } from "react-native-ratings";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
 import { api } from "@/constants/api";
-import CartListItem from "./CartListItem";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import useUserStore from "@/store/userStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import useCartStore from "@/store/cartStore";
 import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import { Skeleton } from "@rneui/base";
