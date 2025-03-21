@@ -38,7 +38,6 @@ const AddressList = ({
   });
   const address = useAddressStore((state) => state.address);
   const setAddress = useAddressStore((state) => state.setAddress);
-  const orderDetails = useOrderStore((state) => state.newOrderDetails);
   const setOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
   async function handleSelectAddress(address: AddressType) {
     const response = await fetch(`${api}/address/update-selected-address`, {

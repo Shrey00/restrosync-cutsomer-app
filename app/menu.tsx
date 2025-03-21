@@ -30,7 +30,7 @@ import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import useCartStore from "@/store/cartStore";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
-export default function menu() {
+export default function Menu() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const { name, restaurantId } = useLocalSearchParams();

@@ -14,25 +14,15 @@ import { useTheme } from "@rneui/themed";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import OrderSuccessMessage from "@/components/OrderSuccessMessage";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
-import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
-import CartListItem from "@/components/CartListItem";
-import DeliveryInfoCard from "@/components/DeliveryInfoCard";
-import ChangeAddressModal from "@/components/ChangeAddressModal";
 import useUserStore from "../store/userStore";
 import useCartStore from "../store/cartStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
 import useModalStore from "@/store/modalsStore";
 import useMenuStore from "@/store/menuStore";
-import { CartItem } from "@/types";
-import { Link } from "expo-router";
-import { AddressType } from "../types";
 import { useRouter, Redirect } from "expo-router";
-import { restaurantId } from "@/constants/restaurantInfo";
 import { Image } from "@rneui/themed";
 import { useLocalSearchParams } from "expo-router";
 import { FoodItemProps } from "@/types";
@@ -41,7 +31,7 @@ import AddToCartModal from "@/components/AddToCartModal";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import { Rating } from "react-native-ratings";
-export default function CartsPage() {
+export default function FoodDetail() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams();
   const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
@@ -169,6 +159,7 @@ export default function CartsPage() {
   const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
 
+  const [activeIndex, setActiveIndex] = useState(0);
   const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
@@ -188,21 +179,11 @@ export default function CartsPage() {
     restaurantId: "",
   });
   const getMenuItem = useMenuStore((state) => state.getMenuItem);
-  //   const cartItems = useCartStore((state) => state.cart);
   const addToCart = useCartStore((state) => state.addToCart);
-  //   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
-  //   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const setCartModalIsOpen = useModalStore(
     (state) => state.setAddToCartModalOpen
   );
-  // const menuItemData = getMenuItem(id as string);
-  const setHoverOrderCardVisible = useModalStore(
-    (state) => state.setHoverOrderInfo
-  );
-  const setOrders = useOrderStore((state) => state.setOrders);
-  const [activeIndex, setActiveIndex] = useState(0);
-
   function checkExisting(
     menuItemId: string,
     addOns: { id: string; name: string; sellingPrice: number }[]
@@ -214,9 +195,7 @@ export default function CartsPage() {
     const addOnsEquality = checkArrayValueEquality(foundItemAddons, addOns);
     return item && addOnsEquality;
   }
-  if (!(user.token.length > 0)) {
-    return <Redirect href={"/login"} />;
-  }
+
   const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
 
   useEffect(() => {
@@ -304,7 +283,7 @@ export default function CartsPage() {
           id: responseData[0].id as string,
           name: menuItemData?.name!,
           menuItemId: responseData[0].menuItemId as string,
-          restaurantId,
+          restaurantId: responseData[0].restaurantId,
           markedPrice: menuItemData?.markedPrice!,
           sellingPrice: responseData[0].finalPrice!,
           cuisineType: menuItemData?.cuisineType! as string,
@@ -324,9 +303,9 @@ export default function CartsPage() {
     }
   }
 
-  const images: string[] = [
-    "https://www.fsiblog3.club/wp-content/uploads/2016/08/naked-indian-desi-shaved-chut.jpg",
-  ];
+  if (!(user.token.length > 0)) {
+    return <Redirect href={"/login"} />;
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View>

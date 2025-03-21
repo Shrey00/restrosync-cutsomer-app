@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
-import { Icon } from "@rneui/themed";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useTheme } from "@rneui/themed";
-import { Card, Image, Button } from "@rneui/themed";
+import { Card } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import useUserStore from "@/store/userStore";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import OrderItemDropdown from "@/components/OrderItemDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FoodItemCard from "@/components/FoodItemCard";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
 import { Skeleton } from "@rneui/base";
 import useAddressStore from "@/store/addressStore";
 import Feather from "@expo/vector-icons/Feather";
@@ -34,7 +29,6 @@ const AddressList = ({
       fontSize: 12.5,
     },
   });
-  const address = useAddressStore((state) => state.address);
   const setAddress = useAddressStore((state) => state.setAddress);
   const setOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
   async function handleSelectAddress(address: AddressType) {

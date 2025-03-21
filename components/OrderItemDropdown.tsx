@@ -11,8 +11,7 @@ const OrderItemDropdown = ({ id }: { id: string }) => {
   const handleMenuItemPress = (action: string) => {
     setVisible(false);
     const url = ("/order-details?orderId=" + id) as Href<string>;
-    if (action === "remove") console.log("somethign");
-    else if (action === "order-detail") router.push(url);
+    if (action === "order-detail") router.push(url);
   };
   // const orders = useOrderStore;
   // useEffect(() => {

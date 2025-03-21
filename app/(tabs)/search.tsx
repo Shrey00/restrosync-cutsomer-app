@@ -2,32 +2,14 @@ import Header from "@/components/Header";
 import useUserStore from "@/store/userStore";
 import { useTheme, ListItem } from "@rneui/themed";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useState } from "react";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  ScrollView,
-  Pressable,
-  Text,
-} from "react-native";
-import { Link } from "expo-router";
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import { Badge } from "@rneui/themed";
 import { api } from "@/constants/api";
 import { Skeleton } from "@rneui/themed";
-import FoodItemCard from "@/components/FoodItemCard";
 import { useRouter } from "expo-router";
-import { getViewProp } from "react-native-reanimated";
-import { getValueFor } from "@/utils";
-import AddToCartModal from "@/components/AddToCartModal";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
-import FiltersModal from "@/components/FiltersModal";
-import ItemOptionsOverlay from "@/components/ItemOptionsOverlay";
-import { FoodItemProps } from "@/types";
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 import VegIcon from "../../assets/veg-icon.svg";
 import NonVegIcon from "../../assets/non-veg-icon.svg";
 import useMenuStore from "@/store/menuStore";
@@ -39,7 +21,7 @@ type SearchItem = {
   cuisineType: string;
   categoryName: string;
 };
-const search = () => {
+export default function Search() {
   const user = useUserStore((state) => state.user);
   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
@@ -270,6 +252,4 @@ const search = () => {
       />
     </SafeAreaView>
   );
-};
-
-export default search;
+}

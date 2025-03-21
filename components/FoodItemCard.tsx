@@ -138,6 +138,7 @@ export default function FoodItemCard({
         setcartButtonText("Added 🎉");
         setHoverCardVisble(true);
         setAddToCartLoading(false);
+        setcartButtonText("Added 🎉");
       } catch (e) {
         console.log(e);
       }

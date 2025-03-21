@@ -35,6 +35,7 @@ const CartListItem = ({
   };
   const { token } = useUserStore((state) => state.user);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  // const updateQuantity = useCartStore((state) => state.updateQuantity);
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const cartItems = useCartStore((state) => state.cart);
@@ -127,7 +128,7 @@ const CartListItem = ({
     },
   });
 
-  const handleUpdateQuantity = async (id: string) => {
+  const handleUpdateQuantity = async (id: string, quantity: number) => {
     if (quantity < 1) return;
     const response = await fetch(`${api}/cart/update-quantity`, {
       method: "PATCH",
@@ -156,6 +157,7 @@ const CartListItem = ({
       removeFromCart(id);
     }
   };
+  console.log(id,name,cuisineType,sellingPrice)
   return (
     <ListItem key={id} containerStyle={styles.listItem}>
       <ListItem.Content>
@@ -189,7 +191,7 @@ const CartListItem = ({
                   />
                 }
                 onPress={() => {
-                  handleUpdateQuantity(id);
+                  handleUpdateQuantity(id, quantity-1);
                 }}
                 buttonStyle={styles.quantityButtonMinus}
               />
@@ -202,7 +204,7 @@ const CartListItem = ({
                     color={theme.colors.primary}
                   />
                 }
-                onPress={() => handleUpdateQuantity(id)}
+                onPress={() => handleUpdateQuantity(id,quantity+1)}
                 buttonStyle={styles.quantityButtonPlus}
               />
             </View>

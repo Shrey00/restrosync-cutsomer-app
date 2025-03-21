@@ -76,32 +76,10 @@ export default function Index() {
       }}
     >
       <Header user={user} showSearch={true} />
-
-      {/* <View
-        style={{
-          marginHorizontal: 10,
-          borderRadius: 8,
-          height: 200,
-          backgroundColor: theme.colors.primary,}}
-      >
-
-      </View> */}
       <View
         id="carousel-component"
         // dataSet={{ kind: "basic-layouts", name: "left-align" }}
       >
-        {/* <Carousel
-          loop={true}
-          width={430}
-          height={258}
-          snapEnabled={true}
-          pagingEnabled={true}
-          autoPlayInterval={2000}
-          data={defaultDataWith6Colors}
-          style={{ width: "100%" }}
-          onSnapToItem={(index : number) => console.log("current index:", index)}
-          renderItem={renderItem({ rounded: true, style: { marginRight: 8 } })}
-        /> */}
       </View>
       <SlideLinkCardSection
         heading="Restaurants"
@@ -124,7 +102,6 @@ export default function Index() {
         isVisible={hoverOrderCardVisible}
         setIsVisible={setHoverOrderCardVisible}
       />
-      {/* <RatingModal isOpen={true} setIsOpen={setIsRatingModalOpen}/> */}
     </SafeAreaView>
   );
 }

@@ -165,6 +165,9 @@ const Header = ({
                 locationAccessDenied === "done" ? (
                   <View>
                     <Text style={styles.locationText} numberOfLines={1}>
+                      {locationText.formattedAddress}
+                    </Text>
+                    {/* <Text style={styles.locationText} numberOfLines={1}>
                       {locationText.subLocality
                         ? locationText.subLocality
                         : "----" + ","}
@@ -172,7 +175,7 @@ const Header = ({
                         ? locationText.neighbourhood
                         : "----" + ","}
                       {locationText.areaName && locationText.areaName + ","}
-                    </Text>
+                    </Text>*/}
                     <Text style={styles.locationTextCity}>
                       {locationText.state ? locationText.state : "--"},{" "}
                       {locationText.country ? locationText.country : "--"}

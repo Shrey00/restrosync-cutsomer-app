@@ -1,22 +1,17 @@
 import { Text, View } from "react-native";
-import Header from "@/components/Header";
-import SearchBar from "@/components/Search";
-import { ScrollView, StyleSheet, Pressable } from "react-native";
+
+import { StyleSheet, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@rneui/themed";
-import SlideLinkCardSection from "@/components/SlideLinkCardSection";
 import CustomInput from "@/components/ui/CustomInput";
 import React, { useState, useEffect } from "react";
-import { Input, Button } from "@rneui/themed";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { Button } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
 import useUserStore from "../store/userStore";
-import { save, updateToken } from "@/utils";
+import { save } from "@/utils";
 import { router } from "expo-router";
 import { api } from "../constants/api";
-import { validatePathConfig } from "@react-navigation/native";
 import { Link } from "expo-router";
 const LoginScreen = () => {
   const { theme } = useTheme();
@@ -242,7 +237,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function login() {
+export default function Login() {
   const { theme } = useTheme();
   const styles = StyleSheet.create({
     welcomeContainer: {

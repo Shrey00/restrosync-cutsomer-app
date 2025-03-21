@@ -118,6 +118,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
     cartButton: {
       backgroundColor: theme.colors.primary,
       paddingVertical: 12,
+      height: 50,
     },
     cartButtonTitle: {
       fontSize: 16,
@@ -168,6 +169,8 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
           const optionsData = responseData.data.filter((item: any) => {
             return item.variant === "child";
           });
+          console.log("REQUEST BRO")
+          console.log(optionsData)
           setAddOnsState(addOnsData);
           setOptionsState(optionsData);
           setVariantsDataLoading(false);
@@ -178,16 +181,18 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
     }
   }, [isOpen]);
   useEffect(() => {
+    console.log("HEy this is happening");
     const price = optionsState[selectedIndex]
       ? optionsState[selectedIndex]?.sellingPrice
       : menuItemData.sellingPrice;
+    console.log(price, selectedIndex, optionsState[selectedIndex]);
     setcartButtonText(`Add to cart at ₹${price}`);
-  }, [selectedIndex, variantsDataLoading]);
+  }, [selectedIndex, isOpen, optionsState]);
   useEffect(() => {
     const addOnsData = getAddOns();
     const totalPrice = getTotalPrice(addOnsData);
     setcartButtonText(`Add to cart at ₹${totalPrice}`);
-  }, [addOnCheckedIndex, variantsDataLoading]);
+  }, [addOnCheckedIndex, isOpen]);
   const handleScroll = (event: any) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -301,6 +306,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
       setTimeout(() => {
         setIsOpen(false);
       }, 1000);
+      setcartButtonText("Add");
       setAddToCartLoading(false);
     } catch (e) {
       console.log(e);
