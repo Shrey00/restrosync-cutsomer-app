@@ -1,6 +1,6 @@
 import { View, Text, Animated, StyleSheet } from "react-native";
 import React, { useRef } from "react";
-import { Card, Button, useTheme } from "@rneui/themed";
+import { Button, useTheme } from "@rneui/themed";
 import useCartStore from "@/store/cartStore";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -70,8 +70,12 @@ const HoverCardCartInfo = ({
         }}
       >
         <View>
-          <View style={{flexDirection:"row", gap:4, alignItems:"center"}}>
-            <AntDesign name="shoppingcart" size={20} color={theme.colors.primary} />
+          <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
+            <AntDesign
+              name="shoppingcart"
+              size={20}
+              color={theme.colors.primary}
+            />
             <Text style={{ fontFamily: "jakarta-sans-semibold" }}>
               {cartHoverInfo.item?.name}
             </Text>

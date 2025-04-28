@@ -325,6 +325,8 @@ export default function CartsPage() {
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;
   }
+
+
   return (
     <SafeAreaView style={styles.container}>
       {orderSuccessVisible ? (
@@ -449,6 +451,8 @@ export default function CartsPage() {
                       borderColor: theme.colors.primary,
                       backgroundColor: "transparent",
                     }}
+                    disabled
+                    
                   />
                   <Button
                     title="Place Order"

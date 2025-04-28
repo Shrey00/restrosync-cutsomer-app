@@ -55,7 +55,7 @@ const AddressList = ({
     }
   }
   return (
-    <ScrollView contentContainerStyle={{paddingBottom:12}}>
+    <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
       {allAddresses?.map((item, index) => {
         return (
           <Card
@@ -283,6 +283,8 @@ const ChangeAddressModal = () => {
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
+
         <Animated.View
           style={[
             styles.modalContent,

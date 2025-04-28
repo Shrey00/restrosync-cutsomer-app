@@ -15,7 +15,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import useUserStore from "@/store/userStore";
 import * as Location from "expo-location";
 import CustomInput from "./ui/CustomInput";
-import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
 import useLocationStore from "@/store/locationStore";
@@ -53,10 +53,10 @@ const AddAddressModal = () => {
       selected: false,
     });
   const [addressModalScreen, setAddressModalScreen] = useState(1);
-  const [centerCoordinates, setCenterCoordinates] = useState<{
+  const centerCoordinates: {
     latitude: number;
     longitude: number;
-  }>({ latitude: 0, longitude: 0 });
+  } = { latitude: 0, longitude: 0 };
 
   const [initialRegion, setInitialRegion] = useState<Region | undefined>(
     undefined
@@ -163,11 +163,11 @@ const AddAddressModal = () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       let location: any;
       if (status !== "granted") {
-        setLocationAccessDenied("done");
+        // setLocationAccessDenied("done");
         return;
       } else {
         location = await Location.getCurrentPositionAsync({});
-        setLocationAccessDenied("done");
+        // setLocationAccessDenied("done");
       }
       setLocation(location);
       const response = await fetch(
@@ -309,6 +309,7 @@ const AddAddressModal = () => {
       onRequestClose={() => setIsOpen(false)}
     >
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
         <Animated.View
           style={[
             styles.modalContent,

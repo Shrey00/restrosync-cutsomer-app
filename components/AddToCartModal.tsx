@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  Pressable
 } from "react-native";
 import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text, Skeleton } from "@rneui/themed";
@@ -169,8 +170,6 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
           const optionsData = responseData.data.filter((item: any) => {
             return item.variant === "child";
           });
-          console.log("REQUEST BRO")
-          console.log(optionsData)
           setAddOnsState(addOnsData);
           setOptionsState(optionsData);
           setVariantsDataLoading(false);
@@ -181,7 +180,6 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
     }
   }, [isOpen]);
   useEffect(() => {
-    console.log("HEy this is happening");
     const price = optionsState[selectedIndex]
       ? optionsState[selectedIndex]?.sellingPrice
       : menuItemData.sellingPrice;
@@ -316,6 +314,8 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
+
         <Animated.View
           style={[
             styles.modalContent,

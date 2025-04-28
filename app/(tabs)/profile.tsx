@@ -64,6 +64,7 @@ export default function Profile() {
       backgroundColor: theme.colors.white,
       borderBottomWidth: 1,
       borderColor: "#EDEDED",
+      width: "auto",
     },
   });
 
@@ -137,40 +138,42 @@ export default function Profile() {
             </View>
           </Card>
           <Card containerStyle={styles.cardContainer}>
-            <Link href="/profile-settings">
+            <Pressable onPress={() => router.push("/profile-settings")}>
               <ListItem containerStyle={styles.listItem}>
                 <AntDesign name="user" size={20} color={theme.colors.primary} />
                 <ListItem.Content>
                   <ListItem.Title>Profile Details & Settings</ListItem.Title>
                 </ListItem.Content>
               </ListItem>
-            </Link>
-            <Link href="/address">
+            </Pressable>
+            <Pressable onPress={() => router.push("/address")}>
               <ListItem containerStyle={styles.listItem}>
                 <Entypo name="address" size={24} color={theme.colors.primary} />
                 <ListItem.Content>
                   <ListItem.Title>Addresses</ListItem.Title>
                 </ListItem.Content>
               </ListItem>
-            </Link>
-            <Link href="/orders">
+            </Pressable>
+            <Pressable onPress={() => router.push("/orders")}>
               <ListItem containerStyle={styles.listItem}>
                 <Feather name="list" size={24} color={theme.colors.primary} />
                 <ListItem.Content>
                   <ListItem.Title>Orders</ListItem.Title>
                 </ListItem.Content>
               </ListItem>
-            </Link>
-            <ListItem containerStyle={styles.listItem}>
-              <Entypo
-                name="star-outlined"
-                size={24}
-                color={theme.colors.primary}
-              />
-              <ListItem.Content>
-                <ListItem.Title>Rate Us</ListItem.Title>
-              </ListItem.Content>
-            </ListItem>
+            </Pressable>
+            <Pressable onPress={() => router.push("/orders")}>
+              <ListItem containerStyle={styles.listItem}>
+                <Entypo
+                  name="star-outlined"
+                  size={24}
+                  color={theme.colors.primary}
+                />
+                <ListItem.Content>
+                  <ListItem.Title>Rate Us</ListItem.Title>
+                </ListItem.Content>
+              </ListItem>
+            </Pressable>
             <Pressable onPress={handleShare}>
               <ListItem containerStyle={styles.listItem}>
                 <AntDesign

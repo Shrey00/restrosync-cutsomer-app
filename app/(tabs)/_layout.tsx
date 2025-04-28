@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import BottomTab from "@/components/BottomTab";
 export default function TabLayout() {
   return (
-    <Tabs tabBar={BottomTab}>
+    <Tabs tabBar={(props) => <BottomTab {...props} />}>
       <Tabs.Screen
         name="index"
         options={{

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Modal,
   Animated,
@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { Card, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
@@ -201,6 +202,8 @@ const FiltersModal = () => {
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
+
         <Animated.View
           style={[
             styles.modalContent,

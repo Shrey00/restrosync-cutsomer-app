@@ -12,6 +12,7 @@ import useModalStore from "@/store/modalsStore";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import useOrderStore from "@/store/orderStore";
 export default function Index() {
+  alert("This is home")
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const [restaurantsState, setRestaurantsState] = useState([]);
@@ -49,7 +50,7 @@ export default function Index() {
         console.log(e);
       }
     })();
-  }, [setHoverOrderCardVisible, setOrders, user.token]);
+  }, [user.token]);
   useEffect(() => {
     (async () => {
       try {
@@ -79,8 +80,7 @@ export default function Index() {
       <View
         id="carousel-component"
         // dataSet={{ kind: "basic-layouts", name: "left-align" }}
-      >
-      </View>
+      ></View>
       <SlideLinkCardSection
         heading="Restaurants"
         link={{ text: "", link: "/" }}

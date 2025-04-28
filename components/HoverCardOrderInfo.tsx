@@ -69,26 +69,22 @@ const HoverCardOrderInfo = ({
             alignItems: "center",
           }}
         >
-          <View>
-            <View
-              style={{ flexDirection: "row", gap: 4, alignItems: "center" }}
+          <View style={{ flexDirection: "column" }}>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: "jakarta-sans-semibold",
+                width: 200,
+              }}
             >
-              {/* <AntDesign
-                name="shoppingcart"
-                size={20}
-                color={theme.colors.primary}
-              /> */}
-              <Text style={{ fontFamily: "jakarta-sans-semibold" }}>
-                {currentOrders[0]?.orderItems[0]?.name}
-              </Text>
-            </View>
+              {currentOrders[0]?.orderItems[0]?.name}
+            </Text>
             {(currentOrders[0]?.orderItems.length > 0 ||
               currentOrders.length > 0) && (
               <Text
                 style={{
                   fontFamily: "jakarta-sans-medium",
                   fontSize: 11.8,
-                  width: "90%",
                 }}
               >
                 and other items

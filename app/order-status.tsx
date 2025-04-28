@@ -2,31 +2,74 @@ import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { Icon } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
-import { api, socketApi } from "../constants/api";
-import { Card, Image, Button } from "@rneui/themed";
+import { socketApi } from "../constants/api";
+import { Card } from "@rneui/themed";
 import { useLocalSearchParams } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FoodItemCard from "@/components/FoodItemCard";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
-import useUserStore from "@/store/userStore";
 import useOrderStore from "@/store/orderStore";
 import { useRouter } from "expo-router";
-const stages = [
-  { id: 1, name: "Order Confirmed", icon: "check-circle", reached: false },
-  { id: 2, name: "Preparing", icon: "utensils", reached: false },
-  { id: 3, name: "Order Picked Up", icon: "truck", reached: false },
-  { id: 4, name: "Out for Delivery", icon: "map-marker-alt", reached: false },
-  { id: 5, name: "Delivered", icon: "home", reached: false },
-];
 
 const OrderStatus = () => {
   const { orderId } = useLocalSearchParams();
   const getOrder = useOrderStore((state) => state.getOrder);
   const orderDetail = getOrder(orderId as string);
-  const [orderStatus, setOrderStatus] = useState("");
-
+  console.log(orderDetail);
+  // const [orderStatus, setOrderStatus] = useState("");
+  const [stages, setStages] = useState([
+    { id: 1, name: "Order Confirmed", icon: "check-circle", reached: false },
+    { id: 2, name: "Preparing", icon: "utensils", reached: false },
+    { id: 3, name: "Order Picked Up", icon: "truck", reached: false },
+    { id: 4, name: "Out for Delivery", icon: "map-marker-alt", reached: false },
+    { id: 5, name: "Delivered", icon: "home", reached: false },
+  ]);
+  function renderUpdateStages(orderStatus: string) {
+    const updatedStages = stages.map((stage) => {
+      if (
+        orderDetail &&
+        (orderDetail.deliveryStatus === "Confirmed" ||
+          orderStatus === "Confirmed") &&
+        stage.id <= 1
+      ) {
+        stage.reached = true;
+      } else if (
+        orderDetail &&
+        (orderDetail.deliveryStatus === "Preparing" ||
+          orderStatus === "Preparing" ||
+          orderStatus === "Ready") &&
+        stage.id <= 2
+      ) {
+        stage.reached = true;
+      } else if (
+        orderDetail &&
+        (orderDetail.deliveryStatus === "Picked" || orderStatus === "Picked") &&
+        stage.id <= 3
+      ) {
+        stage.reached = true;
+      } else if (
+        orderDetail &&
+        (orderDetail.deliveryStatus === "Enroute" ||
+          orderStatus === "Enroute") &&
+        stage.id <= 4
+      ) {
+        stage.reached = true;
+      } else if (
+        orderDetail &&
+        (orderDetail.deliveryStatus === "Delivered" ||
+          orderStatus === "Delivered") &&
+        stage.id <= 5
+      ) {
+        stage.reached = true;
+      } else {
+        stage.reached = false;
+      }
+      return stage;
+    });
+    console.log(JSON.stringify(updatedStages, null, 2));
+    setStages(updatedStages);
+  }
   useEffect(() => {
     // Establish WebSocket connection
     const ws = new WebSocket(`${socketApi}/order-status?orderId=${orderId}`);
@@ -40,7 +83,8 @@ const OrderStatus = () => {
 
     ws.onmessage = (event) => {
       console.log("Message received:", event.data);
-      setOrderStatus(event.data.orderStatus);
+      // setOrderStatus(event.data.orderStatus);
+      renderUpdateStages(JSON.parse(event.data).orderStatus);
     };
 
     ws.onerror = (error) => {
@@ -51,46 +95,12 @@ const OrderStatus = () => {
       console.log("WebSocket connection closed.");
     };
 
+    renderUpdateStages(orderDetail?.deliveryStatus!);
     return () => {
       ws.close();
     };
   }, []);
-  stages.map((stage) => {
-    if (
-      orderDetail &&
-      (orderDetail.deliveryStatus === "Confirmed" ||
-        orderStatus === "Confirmed") &&
-      stage.id <= 1
-    ) {
-      stage.reached = true;
-    } else if (
-      orderDetail &&
-      (orderDetail.deliveryStatus === "Preparing" ||
-        orderStatus === "Preparing") &&
-      stage.id <= 2
-    ) {
-      stage.reached = true;
-    } else if (
-      orderDetail &&
-      (orderDetail.deliveryStatus === "Picked" || orderStatus === "Picked") &&
-      stage.id <= 3
-    ) {
-      stage.reached = true;
-    } else if (
-      orderDetail &&
-      (orderDetail.deliveryStatus === "Enroute" || orderStatus === "Enroute") &&
-      stage.id <= 4
-    ) {
-      stage.reached = true;
-    } else if (
-      orderDetail &&
-      (orderDetail.deliveryStatus === "Delivered" ||
-        orderStatus === "Delivered") &&
-      stage.id <= 5
-    ) {
-      stage.reached = true;
-    }
-  });
+
   const { theme } = useTheme();
   const styles = StyleSheet.create({
     card: {

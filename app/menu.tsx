@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Dimensions,
-  ScrollView,
-  Pressable,
-  Text,
-} from "react-native";
+import { StyleSheet, View, Dimensions, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Badge, ListItem } from "@rneui/themed";
 import { api } from "@/constants/api";
@@ -91,12 +84,11 @@ export default function Menu() {
   const setCartHoverInfo = useCartStore((state) => state.setCartHoverInfo);
   const cart = useCartStore((state) => state.cart);
   const setCartItem = useCartStore((state) => state.setCartItem);
-  const cartHoverInfo = useCartStore((state) => state.cartHoverInfo);
   const [loadingMenuItems, setLoadingMenuItems] = useState(true);
   const [categoryExpanded, setCategoryExpanded] = useState<boolean[]>([]);
   // const [hoverCardVisble, setHoverCardVisble] = useState(false);
-  const hoverCardVisble = useModalStore((state)=>state.hoverCartInfo);
-  const setHoverCardVisble = useModalStore((state)=>state.setHoverCartInfo);
+  const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
+  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
@@ -150,6 +142,7 @@ export default function Menu() {
     setMenu([]);
     (async () => {
       try {
+        setLoadingMenuItems(true);
         const endpoint = generateMenuEndpoint();
         const response = await fetch(endpoint, {
           method: "POST",
@@ -294,94 +287,93 @@ export default function Menu() {
           })}
         </ScrollView>
       </View>
-      {menu.length !== 0 || loadingMenuItems ? (
-        <ScrollView
-          onScroll={(e) => handleScrollCardView(e)}
-          contentContainerStyle={{
-            paddingBottom: 10,
-          }}
-        >
-          {loadingMenuItems ? (
-            <View style={styles.skeletonContainer}>
-              <Skeleton
-                animation="pulse"
-                width={CARD_WIDTH}
-                height={140}
-                style={styles.skeletonStructure}
-                skeletonStyle={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={CARD_WIDTH}
-                height={140}
-                style={styles.skeletonStructure}
-                skeletonStyle={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={CARD_WIDTH}
-                height={140}
-                style={styles.skeletonStructure}
-                skeletonStyle={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={CARD_WIDTH}
-                height={140}
-                style={styles.skeletonStructure}
-                skeletonStyle={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={CARD_WIDTH}
-                height={140}
-                style={styles.skeletonStructure}
-                skeletonStyle={styles.skeleton}
-              />
-            </View>
-          ) : (
-            menu?.map((item, index) => {
-              return (
-                <ListItem.Accordion
-                  key={index}
-                  animation={{ type: "timing", duration: 50 }}
-                  content={
-                    <ListItem.Content>
-                      <ListItem.Title>{item.category}</ListItem.Title>
-                    </ListItem.Content>
-                  }
-                  isExpanded={categoryExpanded[index]}
-                  onPress={() => {
-                    let categoryExpandedModified = [...categoryExpanded];
-                    categoryExpandedModified[index] =
-                      !categoryExpandedModified[index];
-                    setCategoryExpanded(categoryExpandedModified);
-                  }}
-                >
-                  {item.items?.map((menuItem, i) => (
-                    <FoodItemCard
-                      key={i}
-                      id={menuItem.id}
-                      restaurantId={menuItem.restaurantId}
-                      name={menuItem.name}
-                      images={menuItem.images}
-                      rating={menuItem.rating}
-                      markedPrice={menuItem.markedPrice}
-                      discount={menuItem.discount}
-                      sellingPrice={menuItem.sellingPrice}
-                      cuisineType={menuItem.cuisineType}
-                      description={menuItem.description}
-                      variant={menuItem.variant}
-                      user={user}
-                      setMenuItemData={() => setMenuItemData(menuItem)}
-                    />
-                  ))}
-                </ListItem.Accordion>
-              );
-            })
-          )}
-        </ScrollView>
-      ) : (
+      <ScrollView
+        onScroll={(e) => handleScrollCardView(e)}
+        contentContainerStyle={{
+          paddingBottom: 10,
+        }}
+      >
+        {loadingMenuItems ? (
+          <View style={styles.skeletonContainer}>
+            <Skeleton
+              animation="pulse"
+              width={CARD_WIDTH}
+              height={140}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
+            />
+            <Skeleton
+              animation="pulse"
+              width={CARD_WIDTH}
+              height={140}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
+            />
+            <Skeleton
+              animation="pulse"
+              width={CARD_WIDTH}
+              height={140}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
+            />
+            <Skeleton
+              animation="pulse"
+              width={CARD_WIDTH}
+              height={140}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
+            />
+            <Skeleton
+              animation="pulse"
+              width={CARD_WIDTH}
+              height={140}
+              style={styles.skeletonStructure}
+              skeletonStyle={styles.skeleton}
+            />
+          </View>
+        ) : (
+          menu?.map((item, index) => {
+            return (
+              <ListItem.Accordion
+                key={index}
+                animation={{ type: "timing", duration: 50 }}
+                content={
+                  <ListItem.Content>
+                    <ListItem.Title>{item.category}</ListItem.Title>
+                  </ListItem.Content>
+                }
+                isExpanded={categoryExpanded[index]}
+                onPress={() => {
+                  let categoryExpandedModified = [...categoryExpanded];
+                  categoryExpandedModified[index] =
+                    !categoryExpandedModified[index];
+                  setCategoryExpanded(categoryExpandedModified);
+                }}
+              >
+                {item.items?.map((menuItem, i) => (
+                  <FoodItemCard
+                    key={i}
+                    id={menuItem.id}
+                    restaurantId={menuItem.restaurantId}
+                    name={menuItem.name}
+                    images={menuItem.images}
+                    rating={menuItem.rating}
+                    markedPrice={menuItem.markedPrice}
+                    discount={menuItem.discount}
+                    sellingPrice={menuItem.sellingPrice}
+                    cuisineType={menuItem.cuisineType}
+                    description={menuItem.description}
+                    variant={menuItem.variant}
+                    user={user}
+                    setMenuItemData={() => setMenuItemData(menuItem)}
+                  />
+                ))}
+              </ListItem.Accordion>
+            );
+          })
+        )}
+      </ScrollView>
+      {!loadingMenuItems && menu.length === 0 && (
         <View
           style={{
             flexDirection: "row",
@@ -397,6 +389,7 @@ export default function Menu() {
           </Text>
         </View>
       )}
+
       <AddToCartModal menuItemData={menuItemData} />
       <HoverCardCartInfo
         isVisible={hoverCardVisble}

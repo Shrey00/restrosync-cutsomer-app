@@ -48,7 +48,7 @@ const SearchBar = ({
     },
     inputErrorStyle: {
       margin: 0,
-      fontSize: 0,
+      // fontSize: 0,
     },
     icon: {
       position: "absolute",

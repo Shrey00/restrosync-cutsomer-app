@@ -48,7 +48,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     },
     inputErrorStyle: {
       margin: 0,
-      fontSize: 0,
+      // fontSize: 0,
     },
     label: {
       fontFamily: "jakarta-sans-medium",

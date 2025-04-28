@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from "react";
 import {
-  Platform,
   View,
   ScrollView,
   StyleSheet,
   Pressable,
   Dimensions,
 } from "react-native";
-import { Card } from "@rneui/themed";
-import Header from "@/components/Header";
 import { Text, Button, Skeleton } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 import { api } from "@/constants/api";
 import useUserStore from "../store/userStore";
 import useCartStore from "../store/cartStore";
-import useAddressStore from "@/store/addressStore";
-import useOrderStore from "@/store/orderStore";
 import useModalStore from "@/store/modalsStore";
 import useMenuStore from "@/store/menuStore";
 import { useRouter, Redirect } from "expo-router";
@@ -28,25 +22,23 @@ import { useLocalSearchParams } from "expo-router";
 import { FoodItemProps } from "@/types";
 import { checkArrayValueEquality } from "@/utils";
 import AddToCartModal from "@/components/AddToCartModal";
-import VegIcon from "../assets/veg-icon.svg";
-import NonVegIcon from "../assets/non-veg-icon.svg";
 import { Rating } from "react-native-ratings";
 export default function FoodDetail() {
   const { theme } = useTheme();
   const { id } = useLocalSearchParams();
-  const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
-  const modTheme = {
-    colors: {
-      primary: theme.colors.primary,
-      secondary: theme.colors.secondary,
-      background: theme.colors.background,
-      white: "#FFFFFF",
-      grey0: "#E0E0E0",
-      grey1: "#BDBDBD",
-      success: "#4CAF50",
-      error: "#F44336",
-    },
-  };
+  // const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
+  // const modTheme = {
+  //   colors: {
+  //     primary: theme.colors.primary,
+  //     secondary: theme.colors.secondary,
+  //     background: theme.colors.background,
+  //     white: "#FFFFFF",
+  //     grey0: "#E0E0E0",
+  //     grey1: "#BDBDBD",
+  //     success: "#4CAF50",
+  //     error: "#F44336",
+  //   },
+  // };
   const { width } = Dimensions.get("window");
   const styles = StyleSheet.create({
     container: {
@@ -124,46 +116,46 @@ export default function FoodDetail() {
     },
   });
 
-  const paymentMethod = [
-    {
-      id: 1,
-      name: "Pay on Delivery",
-      icon: (
-        <MaterialIcons
-          style={{ marginRight: 4 }}
-          name="delivery-dining"
-          size={24}
-          color={theme.colors.primary}
-        />
-      ),
-    },
-  ];
+  // const paymentMethod = [
+  //   {
+  //     id: 1,
+  //     name: "Pay on Delivery",
+  //     icon: (
+  //       <MaterialIcons
+  //         style={{ marginRight: 4 }}
+  //         name="delivery-dining"
+  //         size={24}
+  //         color={theme.colors.primary}
+  //       />
+  //     ),
+  //   },
+  // ];
   const user = useUserStore((state) => state.user);
   const router = useRouter();
   const cartItems = useCartStore((state) => state.cart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const getTotalAmount = useCartStore((state) => state.getTotalAmount);
-  const getTotalSavings = useCartStore((state) => state.getTotalSavings);
-  const setCartItem = useCartStore((state) => state.setCartItem);
-  const setChangeAddressModalOpen = useModalStore(
-    (state) => state.setChangeAddressModalOpen
-  );
-  const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
-  const setAddress = useAddressStore((state) => state.setAddress);
-  const allAddresses = useAddressStore((state) => state.allAddresses);
-  const address = useAddressStore((state) => state.address);
-  const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
-  const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
-  const boolAddressSelected = (address.id ? address.id.length : 0) > 0;
-  const boolHasSavedAddresses = allAddresses.length > 0;
-  const [cartItemsLoading, setCartItemsLoading] = useState(false);
+  // const getTotalAmount = useCartStore((state) => state.getTotalAmount);
+  // const getTotalSavings = useCartStore((state) => state.getTotalSavings);
+  // const setCartItem = useCartStore((state) => state.setCartItem);
+  // const setChangeAddressModalOpen = useModalStore(
+  //   (state) => state.setChangeAddressModalOpen
+  // );
+  // const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
+  // const setAddress = useAddressStore((state) => state.setAddress);
+  // const allAddresses = useAddressStore((state) => state.allAddresses);
+  // const address = useAddressStore((state) => state.address);
+  // const newOrderDetails = useOrderStore((state) => state.newOrderDetails);
+  // const setNewOrderDetails = useOrderStore((state) => state.setNewOrderDetails);
+  // const boolAddressSelected = (address.id ? address.id.length : 0) > 0;
+  // const boolHasSavedAddresses = allAddresses.length > 0;
+  // const [cartItemsLoading, setCartItemsLoading] = useState(false);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
+  // const [orderButtonDisabled, setOrderButtonDisabled] = useState(true);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
-  const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
-  const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
+  // const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
+  // const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const [cartButtonText, setcartButtonText] = useState("Add");
   const [menuItemDataLoading, setMenuItemDataLoading] = useState(true);
   const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
@@ -239,17 +231,6 @@ export default function FoodDetail() {
       return;
     }
     if (menuItemData.variant === "parent") {
-      //   setMenuItemData({
-      //     id,
-      //     name,
-      //     images,
-      //     markedPrice,
-      //     discount,
-      //     sellingPrice,
-      //     cuisineType,
-      //     description,
-      //     variant,
-      //   });
       setCartModalIsOpen(true);
     } else {
       try {
@@ -349,13 +330,23 @@ export default function FoodDetail() {
               animation="pulse"
               height={40}
               style={styles.skeletonStructure}
-              skeletonStyle={{...styles.skeleton, marginLeft: 10, borderRadius: 6, width:240}}
+              skeletonStyle={{
+                ...styles.skeleton,
+                marginLeft: 10,
+                borderRadius: 6,
+                width: 240,
+              }}
             />
             <Skeleton
               animation="pulse"
               height={95}
               style={styles.skeletonStructure}
-              skeletonStyle={{...styles.skeleton, marginHorizontal: 10, borderRadius: 6, width:'95%'}}
+              skeletonStyle={{
+                ...styles.skeleton,
+                marginHorizontal: 10,
+                borderRadius: 6,
+                width: "95%",
+              }}
             />
           </View>
         ) : (

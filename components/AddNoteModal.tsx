@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TextInput,
   ToastAndroid,
+  Pressable,
 } from "react-native";
 import { Button, useTheme } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
@@ -135,9 +136,12 @@ const AddNoteModal = () => {
   const showToast = (text: string) => {
     ToastAndroid.show(text, ToastAndroid.SHORT);
   };
+  
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
+
         <Animated.View
           style={[
             styles.modalContent,

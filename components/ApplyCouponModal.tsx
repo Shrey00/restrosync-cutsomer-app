@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   ToastAndroid,
+  Pressable
 } from "react-native";
 import { Button, useTheme, ListItem } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
@@ -16,6 +17,7 @@ import useUserStore from "@/store/userStore";
 import useModalStore from "@/store/modalsStore";
 import { Skeleton } from "@rneui/base";
 import useCartStore from "@/store/cartStore";
+
 const ApplyCouponModal = () => {
   const { theme } = useTheme();
   const isOpen = useModalStore((state) => state.couponsModalOpen);
@@ -195,6 +197,8 @@ const ApplyCouponModal = () => {
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
+        <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
+
         <Animated.View
           style={[
             styles.modalContent,
@@ -270,7 +274,7 @@ const ApplyCouponModal = () => {
                     </ListItem.Content>
                     {appliedCoupon?.id === item.id ? (
                       <Button
-                        title={'Remove'}
+                        title={"Remove"}
                         type={"outline"}
                         onPress={() => {
                           handleRemoveCoupon(item);
