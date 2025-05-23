@@ -1,7 +1,4 @@
-import {
-  View,
-  StyleSheet,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Card } from "@rneui/themed";
 import { Text, Button } from "@rneui/themed";
 import { useTheme } from "@rneui/themed";
@@ -14,6 +11,10 @@ import useModalStore from "@/store/modalsStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
 import useUserStore from "@/store/userStore";
+import useLocationStore from "@/store/locationStore";
+import { useRouter } from "expo-router";
+import { useEffect, useLayoutEffect } from "react";
+import { api } from "../constants/api";
 const DeliveryInfoCard = ({
   boolAddressSelected,
   boolHasSavedAddresses,
@@ -25,6 +26,9 @@ const DeliveryInfoCard = ({
   const setChangeAddressModalOpen = useModalStore(
     (state) => state.setChangeAddressModalOpen
   );
+  const location = useLocationStore((state) => state.location);
+  const router = useRouter();
+  // const location = useLocationStore((state) => state.location);
   const styles = StyleSheet.create({
     cardContainer: {
       padding: 12,
@@ -47,18 +51,29 @@ const DeliveryInfoCard = ({
   });
 
   function handleChangeAddressButton() {
-    setChangeAddressModalOpen(true);
+    // setChangeAddressModalOpen(true);
+    router.push("/change-address-modal");
   }
   const user = useUserStore((state) => state.user);
   const address = useAddressStore((state) => state.address);
   const deliveryNote = useOrderStore((state) => state.deliveryNote);
   const setDeliveryNote = useOrderStore((state) => state.setDeliveryNote);
-  const setAddNoteModalOpen = useModalStore(
-    (state) => state.setAddNoteModalOpen
-  );
-  function handleAddNoteModal() {
-    setAddNoteModalOpen(true);
+  // const setAddNoteModalOpen = useModalStore(
+  //   (state) => state.setAddNoteModalOpen
+  // );
+  function handleAddNote() {
+    if (deliveryNote.length) setDeliveryNote("");
+    else router.push("/add-delivery-note-modal");
+    // setAddNoteModalOpen(true);
   }
+  // useEffect(() => {
+  //   (async () => {
+  //     const response = await fetch(
+  //       `${api}/orders/delivery-details?lat1=${location?.coords.latitude}&lon1=${location?.coords.longitude}`
+  //     );
+
+  //   })();
+  // }, []);
   return (
     <Card containerStyle={styles.cardContainer}>
       {/* delivery-time-row */}
@@ -112,11 +127,7 @@ const DeliveryInfoCard = ({
                 borderWidth: 0.6,
               }}
               containerStyle={{ marginTop: 6, borderRadius: 8 }}
-              onPress={
-                deliveryNote.length
-                  ? () => setDeliveryNote("")
-                  : handleAddNoteModal
-              }
+              onPress={handleAddNote}
             />
             <Button
               icon={
@@ -125,7 +136,6 @@ const DeliveryInfoCard = ({
                     name="plus"
                     size={16}
                     color="#FDE4E8"
-                    s
                     style={{ marginRight: 6 }}
                   />
                 ) : (
@@ -141,8 +151,8 @@ const DeliveryInfoCard = ({
                 boolHasSavedAddresses && boolAddressSelected
                   ? "Change Address"
                   : boolHasSavedAddresses
-                  ? "Select Address"
-                  : "Add Address"
+                    ? "Select Address"
+                    : "Add Address"
               }
               type={"outline"}
               titleStyle={{ fontSize: 12, color: theme.colors.primary }}

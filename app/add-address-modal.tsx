@@ -6,37 +6,34 @@ import {
   View,
   StyleSheet,
   Pressable,
+  InteractionManager
 } from "react-native";
 import { Button, useTheme } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { api, MAP_API_KEY } from "@/constants/api";
+import { api } from "@/constants/api";
 import Entypo from "@expo/vector-icons/Entypo";
 import useUserStore from "@/store/userStore";
-import * as Location from "expo-location";
-import CustomInput from "./ui/CustomInput";
+import CustomInput from "../components/ui/CustomInput";
 import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { AddressType } from "@/types";
-import useModalStore from "@/store/modalsStore";
+import { useRouter } from "expo-router";
 import useLocationStore from "@/store/locationStore";
 import SelectDropdown from "react-native-select-dropdown";
+import { Skeleton } from "@rneui/base";
 const AddAddressModal = () => {
   const { theme } = useTheme();
+  const router = useRouter();
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offaddressModalScreen)
-  const isOpen = useModalStore((state) => state.addAddressModalOpen);
-  const setIsOpen = useModalStore((state) => state.setAddAddressModalOpen);
+  const isOpen = true;
   const user = useUserStore((state) => state.user);
-  const location = useLocationStore((state) => state.location);
   const locationText = useLocationStore((state) => state.locationText);
-  const setNewLocation = useLocationStore((state) => state.setNewLocation); //new location to handle food ordering to address where user is not present.
-  const setLocation = useLocationStore((state) => state.setLocation);
-  const setLocationText = useLocationStore((state) => state.setLocationText);
-  const [locationAccessDenied, setLocationAccessDenied] = useState<
-    "waiting" | "done"
-  >("waiting");
+  const setNewLocation = useLocationStore((state) => state.setNewLocation); //new location to handle food ordering to address where user is not present
+  const location = useLocationStore((state) => state.location);
   const [addressSubmitLoading, setAddressSubmitLoading] = useState(false);
   const [addressButtonTitle, setAddressButtonTitle] = useState("Add Address");
   const [addressButtonDisabled, setAddressDisabled] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const [addressDetailsFormData, setAddressDetailsFormData] =
     useState<AddressType>({
       address_line_1: "",
@@ -71,11 +68,12 @@ const AddAddressModal = () => {
   }
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: 800, // Slide back down
-      duration: 120,
-      useNativeDriver: true,
-    }).start(() => setIsOpen(false));
+    // Animated.timing(slideAnim, {
+    //   toValue: 800, // Slide back down
+    //   duration: 120,
+    //   useNativeDriver: true,
+    // }).start(() => setIsOpen(false));
+    router.back();
   };
   const styles = StyleSheet.create({
     container: {
@@ -158,61 +156,6 @@ const AddAddressModal = () => {
     },
   });
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      let location: any;
-      if (status !== "granted") {
-        // setLocationAccessDenied("done");
-        return;
-      } else {
-        location = await Location.getCurrentPositionAsync({});
-        // setLocationAccessDenied("done");
-      }
-      setLocation(location);
-      const response = await fetch(
-        `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${location.coords.latitude},${location.coords.longitude}&api_key=${MAP_API_KEY}`
-      );
-      const responseData = await response.json();
-      let requiredLocationData = {
-        formattedAddress: "",
-        areaName: "",
-        subLocality: "",
-        neighbourhood: "",
-        city: "",
-        country: "",
-        state: "",
-        postalCode: "",
-      };
-      requiredLocationData.formattedAddress =
-        responseData?.results[0].formatted_address;
-      requiredLocationData.areaName = responseData?.results[0].name;
-      responseData?.results[0].address_components.forEach(
-        (item: any, index: number) => {
-          if (item.types) {
-            for (let i = 0; i < item.types.length; ++i) {
-              if (item.types[i] === "country")
-                requiredLocationData.country = item.short_name;
-              if (item.types[i] === "administrative_area_level_1")
-                requiredLocationData.state = item.short_name;
-              if (item.types[i] === "administrative_area_level_2")
-                requiredLocationData.city = item.short_name;
-              if (item.types[i] === "locality")
-                requiredLocationData.areaName = item.short_name;
-              if (item.types[i] === "sublocality")
-                requiredLocationData.subLocality = item.short_name;
-              if (item.types[i] === "neighborhood")
-                requiredLocationData.neighbourhood = item.short_name;
-              if (item.types[i] === "postal_code")
-                requiredLocationData.postalCode = item.short_name;
-            }
-          }
-        }
-      );
-      setLocationText(requiredLocationData);
-    })();
-  }, [isOpen]);
-
   const handleRegionChangeComplete = (newRegion: any) => {
     setAddressDetailsFormData({
       ...addressDetailsFormData,
@@ -250,7 +193,7 @@ const AddAddressModal = () => {
     setAddressSubmitLoading(false);
     setAddressButtonTitle("Added 🎉");
     setTimeout(() => {
-      setIsOpen(false);
+      // setIsOpen(false);
       setAddressModalScreen(1);
       setAddressDetailsFormData({
         ...addressDetailsFormData,
@@ -259,11 +202,12 @@ const AddAddressModal = () => {
         type: "",
       });
       setAddressButtonTitle("Add Address");
+      router.back();
     }, 1000);
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && initialRegion?.latitudeDelta !== 0.0922) {
       (async () => {
         try {
           if (location) {
@@ -301,13 +245,13 @@ const AddAddressModal = () => {
       setAddressDisabled(true);
     }
   }, [addressDetailsFormData]);
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => setShowMap(true));
+    return () => task.cancel();
+  }, [])
   return (
-    <Modal
-      transparent
-      visible={isOpen}
-      animationType="none"
-      onRequestClose={() => setIsOpen(false)}
-    >
+    <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>
         <Pressable style={{ flex: 1 }} onPress={closeModal}></Pressable>
         <Animated.View
@@ -350,39 +294,55 @@ const AddAddressModal = () => {
           </View>
 
           {addressModalScreen === 1 && (
-            <View style={{ flex: 1 }}>
-              <View style={{ flex: 1, borderRadius: 8, overflow: "hidden" }}>
-                <MapView
-                  style={StyleSheet.absoluteFillObject}
-                  initialRegion={initialRegion}
-                  showsUserLocation={true}
-                  provider={PROVIDER_GOOGLE}
-                  followsUserLocation={true}
-                  onRegionChangeComplete={handleRegionChangeComplete}
-                />
-                <View
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: [{ translateX: -25 }, { translateY: -50 }],
-                  }}
-                >
-                  <MaterialIcons
-                    name="location-pin"
-                    size={50}
-                    color={theme.colors.primary}
+            showMap ?
+              <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, borderRadius: 8, overflow: "hidden" }}>
+                  <MapView
+                    style={StyleSheet.absoluteFillObject}
+                    initialRegion={initialRegion}
+                    showsUserLocation={true}
+                    provider={PROVIDER_GOOGLE}
+                    followsUserLocation={true}
+                    onRegionChangeComplete={handleRegionChangeComplete}
                   />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: [{ translateX: -25 }, { translateY: -50 }],
+                    }}
+                  >
+                    <MaterialIcons
+                      name="location-pin"
+                      size={50}
+                      color={theme.colors.primary}
+                    />
+                  </View>
                 </View>
+                <Button
+                  title="Add Details"
+                  titleStyle={styles.addButtonDetailsTitle}
+                  buttonStyle={styles.addButtonDetails}
+                  containerStyle={styles.addButtonDetailsContainer}
+                  onPress={handleAddNewLocation}
+                />
               </View>
-              <Button
-                title="Add Details"
-                titleStyle={styles.addButtonDetailsTitle}
-                buttonStyle={styles.addButtonDetails}
-                containerStyle={styles.addButtonDetailsContainer}
-                onPress={handleAddNewLocation}
-              />
-            </View>
+              :
+              <View style={styles.skeletonContainer}>
+                <Skeleton
+                  animation="pulse"
+                  height={570}
+                  style={styles.skeletonStructure}
+                  skeletonStyle={styles.skeleton}
+                />
+                <Skeleton
+                  animation="pulse"
+                  height={48}
+                  style={styles.skeletonStructure}
+                  skeletonStyle={styles.skeleton}
+                />
+              </View>
           )}
           {/* {addressModalScreen-2} */}
           {addressModalScreen === 2 && (
@@ -497,6 +457,6 @@ const AddAddressModal = () => {
       </View>
     </Modal>
   );
-};
+}
 
 export default AddAddressModal;

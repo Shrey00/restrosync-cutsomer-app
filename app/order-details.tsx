@@ -12,7 +12,7 @@ import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import useUserStore from "@/store/userStore";
 import useOrderStore from "@/store/orderStore";
-import {useRouter} from 'expo-router';
+import { useRouter } from 'expo-router';
 const stages = [
   { id: 1, name: "Order Confirmed", icon: "check-circle", reached: false },
   { id: 2, name: "Preparing", icon: "utensils", reached: false },
@@ -160,7 +160,7 @@ const OrderStatus = () => {
         <Pressable
           style={{ marginLeft: 12, flexDirection: "row", alignItems: "center" }}
           onPress={() => {
-             router.replace("/orders");
+            router.replace("/orders");
           }}
         >
           <Entypo
@@ -194,46 +194,46 @@ const OrderStatus = () => {
       </View>
 
       <Card containerStyle={styles.card}>
-              
-                <Text
-                  style={{ fontFamily: "jakarta-sans-semibold", fontSize: 16 }}
-                >
-                  {orderDetail?.restaurantName}
-                </Text>
 
-      
-              <View style={styles.orderItemsContainerBorder}>
-                <Text
-                  style={{
-                    ...styles.fontStyles,
-                    color: theme.colors.grey0,
-                    marginBottom: 6,
-                  }}
-                >
-                  {orderDetail?.orderId}
+        <Text
+          style={{ fontFamily: "jakarta-sans-semibold", fontSize: 16 }}
+        >
+          {orderDetail?.restaurantName}
+        </Text>
+
+
+        <View style={styles.orderItemsContainerBorder}>
+          <Text
+            style={{
+              ...styles.fontStyles,
+              color: theme.colors.grey0,
+              marginBottom: 6,
+            }}
+          >
+            {orderDetail?.orderId}
+          </Text>
+          {orderDetail?.orderItems?.map((orderItem, orderItemIndex) => {
+            return (
+              <View style={styles.flexRowContainer} key={orderItemIndex}>
+                <Text style={styles.fontStyles}>
+                  {orderItem.cuisineType === "veg" ? (
+                    <VegIcon width={14} height={14} />
+                  ) : (
+                    <NonVegIcon width={18} height={18} />
+                  )}
+                  {"  "}
+                  {orderItem.quantity} x {orderItem.name}
                 </Text>
-                {orderDetail?.orderItems?.map((orderItem, orderItemIndex) => {
-                  return (
-                    <View style={styles.flexRowContainer} key={orderItemIndex}>
-                      <Text style={styles.fontStyles}>
-                        {orderItem.cuisineType === "veg" ? (
-                          <VegIcon width={14} height={14} />
-                        ) : (
-                          <NonVegIcon width={18} height={18} />
-                        )}
-                        {"  "}
-                        {orderItem.quantity} x {orderItem.name}
-                      </Text>
-                      <Text style={styles.fontStyles}>₹{orderItem.amount}</Text>
-                    </View>
-                  );
-                })}
+                <Text style={styles.fontStyles}>₹{orderItem.amount}</Text>
               </View>
-              <View style={styles.flexRowContainer}>
-                <Text style={styles.fontStyles}>Grand Total</Text>
-                <Text style={styles.fontStyles}>₹{orderDetail?.totalAmount}</Text>
-              </View>
-            </Card>
+            );
+          })}
+        </View>
+        <View style={styles.flexRowContainer}>
+          <Text style={styles.fontStyles}>Grand Total</Text>
+          <Text style={styles.fontStyles}>₹{orderDetail?.totalAmount}</Text>
+        </View>
+      </Card>
       <Card
         containerStyle={{
           ...styles.card,

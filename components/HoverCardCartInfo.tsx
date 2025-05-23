@@ -7,10 +7,10 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import useModalStore from "@/store/modalsStore";
 const HoverCardCartInfo = ({
   isVisible,
-  setIsVisible,
+  // setIsVisible,
 }: {
   isVisible: boolean;
-  setIsVisible: any;
+  // setIsVisible: any;
 }) => {
   const slideAnim = useRef(new Animated.Value(300)).current; // Initial position of modal (offscreen)
   const closeModal = () => {

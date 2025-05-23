@@ -57,7 +57,12 @@ export type CartItem = {
   cuisineType: string;
   discount: number;
   quantity: number;
-  addOns: { id: string; name: string; sellingPrice: number }[];
+  addOns: {
+    id: string;
+    name: string;
+    sellingPrice: number;
+    cuisineType: string;
+  }[];
 };
 
 export interface CartItemProps {
@@ -88,7 +93,7 @@ export interface FoodItemProps {
   restaurantId: string;
   variant: string;
   setCartModalVisible?: any;
-  setMenuItemData?: any;
+  // setMenuItemData?: any;
 }
 
 export interface VariantsData {

@@ -15,14 +15,17 @@ import useUserStore from "@/store/userStore";
 import useOrderStore from "@/store/orderStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useModalStore from "@/store/modalsStore";
+import { useRouter } from "expo-router";
 const AddNoteModal = () => {
-  const isOpen = useModalStore((state) => state.addNoteModalOpen);
+  // const isOpen = useModalStore((state) => state.addNoteModalOpen);
+  const isOpen = true;
   const setIsOpen = useModalStore((state) => state.setAddNoteModalOpen);
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
   const { theme } = useTheme();
   const IMAGE_WIDTH = 70;
   const setDeliveryNote = useOrderStore((state) => state.setDeliveryNote);
   const deliveryNote = useOrderStore((state) => state.deliveryNote);
+  const router = useRouter();
   function handleAddNote() {
     showToast("Note added successfully");
     setIsOpen(false);
@@ -36,11 +39,12 @@ const AddNoteModal = () => {
   }
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: 600, // Slide back down
-      duration: 120,
-      useNativeDriver: true,
-    }).start(() => setIsOpen(false));
+    // Animated.timing(slideAnim, {
+    //   toValue: 600, // Slide back down
+    //   duration: 120,
+    //   useNativeDriver: true,
+    // }).start(() => setIsOpen(false));
+    router.back();
   };
   const styles = StyleSheet.create({
     container: {
@@ -136,7 +140,7 @@ const AddNoteModal = () => {
   const showToast = (text: string) => {
     ToastAndroid.show(text, ToastAndroid.SHORT);
   };
-  
+
   return (
     <Modal transparent visible={isOpen} animationType="none">
       <View style={styles.modalOverlay}>

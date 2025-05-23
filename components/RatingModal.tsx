@@ -1,4 +1,4 @@
-import { Modal, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { useState } from "react";
 import { Dialog } from "@rneui/themed";
 import { Rating } from "react-native-ratings";

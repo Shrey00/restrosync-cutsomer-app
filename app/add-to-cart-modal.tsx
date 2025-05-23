@@ -10,19 +10,20 @@ import {
 } from "react-native";
 import { Card, Image, Button, useTheme, CheckBox } from "@rneui/themed";
 import { Icon, Text, Skeleton } from "@rneui/themed";
-import { FoodItemProps } from "@/types/index";
 import { Rating } from "react-native-ratings";
 import VegIcon from "../assets/veg-icon.svg";
 import NonVegIcon from "../assets/non-veg-icon.svg";
 import { api } from "@/constants/api";
+import { useRouter } from "expo-router";
 import useUserStore from "@/store/userStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useCartStore from "@/store/cartStore";
 import useModalStore from "@/store/modalsStore";
 import { checkArrayValueEquality } from "../utils";
-const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
-  const isOpen = useModalStore((state) => state.addToCartModalOpen);
-  const setIsOpen = useModalStore((state) => state.setAddToCartModalOpen);
+const AddToCartModal = () => {
+  //   const isOpen = useModalStore((state) => state.addToCartModalOpen);
+  const isOpen = true;
+  //   const setIsOpen = useModalStore((state) => state.setAddToCartModalOpen);
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedIndex, setIndex] = React.useState(0);
@@ -36,12 +37,13 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   const cartItems = useCartStore((state) => state.cart);
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
+  const menuItemData = useCartStore((state) => state.selectedMenuItemData);
   const [addOnsState, setAddOnsState] = useState<any[]>([]);
   const [optionsState, setOptionsState] = useState<any[]>([]);
   const { theme } = useTheme();
+  const router = useRouter();
   const IMAGE_WIDTH = 70;
   const user = useUserStore((state) => state.user);
-  console.log(addOnsState);
   if (isOpen) {
     Animated.timing(slideAnim, {
       toValue: 0, // Slide to view
@@ -51,11 +53,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
   }
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: 600, // Slide back down
-      duration: 120,
-      useNativeDriver: true,
-    }).start(() => setIsOpen(false));
+    router.back();
   };
   const styles = StyleSheet.create({
     container: {
@@ -267,7 +265,8 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
         setcartButtonText("Added 🎉");
         setHoverCardVisble(true);
         setTimeout(() => {
-          setIsOpen(false);
+          //   setIsOpen(false);
+          router.back();
         }, 1000);
         setAddToCartLoading(false);
         setcartButtonText("Add");
@@ -309,7 +308,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
       setcartButtonText("Added 🎉");
       setHoverCardVisble(true);
       setTimeout(() => {
-        setIsOpen(false);
+        router.back();
       }, 1000);
       setcartButtonText("Add");
       setAddToCartLoading(false);
@@ -355,7 +354,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
                     onScroll={handleScroll}
                     scrollEventThrottle={16}
                   >
-                    {menuItemData.images?.map((image, index) => (
+                    {menuItemData?.images?.map((image, index) => (
                       <Image
                         key={index}
                         source={{ uri: image }}

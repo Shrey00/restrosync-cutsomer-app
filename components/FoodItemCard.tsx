@@ -6,7 +6,6 @@ import NonVegIcon from "../assets/non-veg-icon.svg";
 import { Rating } from "react-native-ratings";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { api } from "@/constants/api";
-import { restaurantId } from "@/constants/restaurantInfo";
 import useCartStore from "@/store/cartStore";
 import { FoodItemProps } from "@/types";
 import useModalStore from "@/store/modalsStore";
@@ -28,9 +27,9 @@ export default function FoodItemCard({
   sellingPrice,
   cuisineType,
   description,
+  restaurantId,
   variant,
   user,
-  setMenuItemData,
 }: FoodItemProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
@@ -40,12 +39,15 @@ export default function FoodItemCard({
   const addToCart = useCartStore((state) => state.addToCart);
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const setSelectedMenuItemData = useCartStore(
+    (state) => state.setSelectedMenuItemData
+  );
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
   const token = useUserStore((state) => state.user.token);
   // const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
-  const setCartModalIsOpen = useModalStore(
-    (state) => state.setAddToCartModalOpen
-  );
+  // const setCartModalIsOpen = useModalStore(
+  //   (state) => state.setAddToCartModalOpen
+  // );
   const handleScroll = (event: any) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -81,7 +83,7 @@ export default function FoodItemCard({
       return;
     }
     if (variant === "parent") {
-      setMenuItemData({
+      setSelectedMenuItemData({
         id,
         name,
         images,
@@ -91,8 +93,11 @@ export default function FoodItemCard({
         cuisineType,
         description,
         variant,
+        rating,
+        restaurantId,
       });
-      setCartModalIsOpen(true);
+      // setCartModalIsOpen(true);
+      router.push("/add-to-cart-modal");
     } else {
       try {
         setAddToCartLoading(true);

@@ -13,6 +13,7 @@ import { Button, useTheme, ListItem } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
 import { Coupon } from "@/types";
 import { api } from "@/constants/api";
+import { useRouter } from "expo-router";
 import useUserStore from "@/store/userStore";
 import useModalStore from "@/store/modalsStore";
 import { Skeleton } from "@rneui/base";
@@ -20,8 +21,9 @@ import useCartStore from "@/store/cartStore";
 
 const ApplyCouponModal = () => {
   const { theme } = useTheme();
-  const isOpen = useModalStore((state) => state.couponsModalOpen);
-  const setIsOpen = useModalStore((state) => state.setCouponsModalOpen);
+  // const isOpen = useModalStore((state) => state.couponsModalOpen);
+  // const setIsOpen = useModalStore((state) => state.setCouponsModalOpen);
+  const isOpen = true;
   const appliedCoupon = useCartStore((state) => state.appliedCoupon);
   const setAppliedCoupon = useCartStore((state) => state.setAppliedCoupon);
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
@@ -29,6 +31,7 @@ const ApplyCouponModal = () => {
   const [activeCouponsList, setActiveCouponsList] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const user = useUserStore((state) => state.user);
+  const router = useRouter();
   if (isOpen) {
     Animated.timing(slideAnim, {
       toValue: 0, // Slide to view
@@ -38,11 +41,12 @@ const ApplyCouponModal = () => {
   }
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: 600, // Slide back down
-      duration: 120,
-      useNativeDriver: true,
-    }).start(() => setIsOpen(false));
+    // Animated.timing(slideAnim, {
+    //   toValue: 600, // Slide back down
+    //   duration: 120,
+    //   useNativeDriver: true,
+    // }).start(() => setIsOpen(false));
+    router.back();
   };
 
   const handleApplyCoupon = (item: Coupon) => {

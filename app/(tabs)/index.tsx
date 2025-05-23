@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@rneui/themed";
 import SlideLinkCardSection from "@/components/SlideLinkCardSection";
-import AddAddressModal from "@/components/AddAddressModal";
+// import AddAddressModal from "@/components/AddAddressModal";
 import Categories from "@/components/Categories";
 import useUserStore from "../../store/userStore";
 import { softwareId, api } from "@/constants/api";
@@ -12,7 +12,6 @@ import useModalStore from "@/store/modalsStore";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import useOrderStore from "@/store/orderStore";
 export default function Index() {
-  alert("This is home")
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const [restaurantsState, setRestaurantsState] = useState([]);
@@ -97,7 +96,7 @@ export default function Index() {
         loading={loading}
       />
       <Categories />
-      <AddAddressModal />
+      {/* <AddAddressModal /> */}
       <HoverCardOrderInfo
         isVisible={hoverOrderCardVisible}
         setIsVisible={setHoverOrderCardVisible}

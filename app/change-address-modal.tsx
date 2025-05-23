@@ -8,17 +8,18 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import { Card, Button, useTheme, CheckBox } from "@rneui/themed";
+import { Card, Button, useTheme } from "@rneui/themed";
 import { Icon, Text } from "@rneui/themed";
 import { api } from "@/constants/api";
+import { Skeleton } from "@rneui/base";
+import { AddressType } from "@/types";
+import { useRouter } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import useUserStore from "@/store/userStore";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { AddressType } from "@/types";
 import useModalStore from "@/store/modalsStore";
-import { Skeleton } from "@rneui/base";
 import useOrderStore from "@/store/orderStore";
 import useAddressStore from "@/store/addressStore";
 
@@ -123,20 +124,22 @@ const AddressList = ({
   );
 };
 const ChangeAddressModal = () => {
-  const isOpen = useModalStore((state) => state.changeAddressModalOpen);
-  const setIsOpen = useModalStore((state) => state.setChangeAddressModalOpen);
+  // const isOpen = useModalStore((state) => state.changeAddressModalOpen);
+  const isOpen = true;
+  // const setIsOpen = useModalStore((state) => state.setChangeAddressModalOpen);
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
   const allAddresses = useAddressStore((state) => state.allAddresses);
   const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
-  const setChangeAddressModalOpen = useModalStore(
-    (state) => state.setChangeAddressModalOpen
-  );
+  // const setChangeAddressModalOpen = useModalStore(
+  //   (state) => state.setChangeAddressModalOpen
+  // );
   const setAddAddressModalOpen = useModalStore(
     (state) => state.setAddAddressModalOpen
   );
   const [addressesLoading, setAddressesLoading] = useState(false);
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
+  const router = useRouter();
   if (isOpen) {
     Animated.timing(slideAnim, {
       toValue: 0, // Slide to view
@@ -146,16 +149,19 @@ const ChangeAddressModal = () => {
   }
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: 600, // Slide back down
-      duration: 120,
-      useNativeDriver: true,
-    }).start(() => setIsOpen(false));
+    // Animated.timing(slideAnim, {
+    //   toValue: 600, // Slide back down
+    //   duration: 120,
+    //   useNativeDriver: true,
+    // }).start(() => setIsOpen(false));
+    router.back();
   };
 
+  //@TODO - Review again and fix for opening add address modal
   const handleAddAddress = () => {
-    setChangeAddressModalOpen(false);
-    setAddAddressModalOpen(true);
+    // setChangeAddressModalOpen(false);
+    // setAddAddressModalOpen(true);
+    router.push('/add-address-modal');
   };
   const styles = StyleSheet.create({
     container: {

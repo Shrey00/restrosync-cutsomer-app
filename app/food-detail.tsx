@@ -231,7 +231,8 @@ export default function FoodDetail() {
       return;
     }
     if (menuItemData.variant === "parent") {
-      setCartModalIsOpen(true);
+      // setCartModalIsOpen(true);
+      router.push('/add-to-cart-modal');
     } else {
       try {
         setAddToCartLoading(true);

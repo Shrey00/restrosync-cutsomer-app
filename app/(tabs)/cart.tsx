@@ -11,14 +11,11 @@ import { api } from "@/constants/api";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
-import ChangeAddressModal from "@/components/ChangeAddressModal";
-import AddNoteModal from "@/components/AddNoteModal";
-import ApplyCouponModal from "@/components/ApplyCouponModal";
 import useUserStore from "../../store/userStore";
 import useCartStore from "../../store/cartStore";
 import useAddressStore from "@/store/addressStore";
 import useOrderStore from "@/store/orderStore";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import { AddressType } from "../../types";
 import { Redirect } from "expo-router";
@@ -156,6 +153,7 @@ export default function CartsPage() {
       ),
     },
   ];
+  const router = useRouter();
   const user: any = useUserStore((state) => state.user);
   const cartItems = useCartStore((state) => state.cart);
   const getTotalAmount = useCartStore((state) => state.getTotalAmount);
@@ -190,10 +188,6 @@ export default function CartsPage() {
   const setHoverCartInfo = useCartStore((state) => state.setCartHoverInfo);
   const setHoverCartVisible = useModalStore((state) => state.setHoverCartInfo);
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
-  const couponsModalOpen = useModalStore((state) => state.couponsModalOpen);
-  const setCouponsModalOpen = useModalStore(
-    (state) => state.setCouponsModalOpen
-  );
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
@@ -326,7 +320,6 @@ export default function CartsPage() {
     return <Redirect href={"/login"} />;
   }
 
-
   return (
     <SafeAreaView style={styles.container}>
       {orderSuccessVisible ? (
@@ -406,7 +399,8 @@ export default function CartsPage() {
                         title={appliedCoupon ? "Change Coupon" : "Apply Coupon"}
                         type={"clear"}
                         onPress={() => {
-                          setCouponsModalOpen(!couponsModalOpen);
+                          // setCouponsModalOpen(!couponsModalOpen);
+                          router.push("/apply-coupon-modal");
                         }}
                         titleStyle={{
                           fontSize: 12,
@@ -452,7 +446,6 @@ export default function CartsPage() {
                       backgroundColor: "transparent",
                     }}
                     disabled
-                    
                   />
                   <Button
                     title="Place Order"
@@ -522,10 +515,6 @@ export default function CartsPage() {
           )}
         </>
       )}
-
-      <ChangeAddressModal />
-      <ApplyCouponModal />
-      <AddNoteModal />
       {cartItems.length === 0 && (
         <HoverCardOrderInfo
           isVisible={hoverOrderCardVisible}

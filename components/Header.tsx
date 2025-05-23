@@ -88,7 +88,7 @@ const Header = ({
         return;
       } else {
         location = await Location.getCurrentPositionAsync({});
-        setLocationAccessDenied("done");
+        // setLocationAccessDenied("done");
       }
       setLocation(location);
       const response = await fetch(
@@ -134,16 +134,17 @@ const Header = ({
     })();
   }, [setLocation, setLocationText]);
 
-  let text = "Waiting..";
-  if (locationAccessDenied) {
-    text = locationAccessDenied;
-  } else if (location) {
-    text = JSON.stringify(location);
-    console.log(text);
-  }
+  // let text = "Waiting..";
+  // if (locationAccessDenied) {
+  //   text = locationAccessDenied;
+  // } else if (location) {
+  //   text = JSON.stringify(location);
+  //   console.log(text);
+  // }
 
   function handleLocationSetting() {
-    setAddAddressModalOpen(true);
+    // setAddAddressModalOpen(true);
+    router.push("/add-address-modal");
   }
 
   return (
@@ -162,20 +163,11 @@ const Header = ({
 
               <View style={{ minWidth: "60%", maxWidth: "68%" }}>
                 {locationText.city.length > 0 ||
-                locationAccessDenied === "done" ? (
+                  locationAccessDenied === "done" ? (
                   <View>
                     <Text style={styles.locationText} numberOfLines={1}>
                       {locationText.formattedAddress}
                     </Text>
-                    {/* <Text style={styles.locationText} numberOfLines={1}>
-                      {locationText.subLocality
-                        ? locationText.subLocality
-                        : "----" + ","}
-                      {locationText.neighbourhood
-                        ? locationText.neighbourhood
-                        : "----" + ","}
-                      {locationText.areaName && locationText.areaName + ","}
-                    </Text>*/}
                     <Text style={styles.locationTextCity}>
                       {locationText.state ? locationText.state : "--"},{" "}
                       {locationText.country ? locationText.country : "--"}

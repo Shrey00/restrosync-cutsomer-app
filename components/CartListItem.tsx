@@ -1,7 +1,7 @@
 import { View, StyleSheet, Pressable } from "react-native";
 import { useTheme } from "@rneui/themed";
 import React from "react";
-import { ListItem, Text, Button, Icon, Divider } from "@rneui/themed";
+import { ListItem, Text, Button } from "@rneui/themed";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useCartStore from "@/store/cartStore";
 import VegIcon from "../assets/veg-icon.svg";
@@ -157,7 +157,6 @@ const CartListItem = ({
       removeFromCart(id);
     }
   };
-  console.log(id,name,cuisineType,sellingPrice)
   return (
     <ListItem key={id} containerStyle={styles.listItem}>
       <ListItem.Content>
@@ -191,7 +190,7 @@ const CartListItem = ({
                   />
                 }
                 onPress={() => {
-                  handleUpdateQuantity(id, quantity-1);
+                  handleUpdateQuantity(id, quantity - 1);
                 }}
                 buttonStyle={styles.quantityButtonMinus}
               />
@@ -204,7 +203,7 @@ const CartListItem = ({
                     color={theme.colors.primary}
                   />
                 }
-                onPress={() => handleUpdateQuantity(id,quantity+1)}
+                onPress={() => handleUpdateQuantity(id, quantity + 1)}
                 buttonStyle={styles.quantityButtonPlus}
               />
             </View>
@@ -218,8 +217,14 @@ const CartListItem = ({
           </View>
         </View>
         {addOns && addOns?.length > 0 && (
-          <View style={{ paddingHorizontal: 8, marginTop: -10 }}>
-            <Text style={styles.addOnHeading}>+</Text>
+          <View
+            style={{
+              paddingHorizontal: 0,
+              marginTop: -6,
+              backgroundColor: "#FFF7FB",
+              borderRadius: 8,
+            }}
+          >
             {addOns?.map((item: any, index: number) => {
               return (
                 <View
@@ -227,12 +232,22 @@ const CartListItem = ({
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    // paddingHorizontal: 12,
-                    // width: "45%",
+                    alignItems: "center",
+                    paddingHorizontal: 8,
+                    paddingVertical: 8,
+                    // marginTop: 4,
+                    width: "100%",
                   }}
                 >
-                  <Text style={styles.addOnText}>{item.name}</Text>
-                  <Text style={styles.addOnText}> - </Text>
+                  <Text style={styles.addOnText}>
+                    {item.cuisineType === "veg" ? (
+                      <VegIcon width={12} height={12} />
+                    ) : (
+                      <NonVegIcon width={12} height={12} />
+                    )}
+                    {"  "}
+                    {item.name}
+                  </Text>
                   <Text style={styles.addOnText}>₹{item.sellingPrice}</Text>
                 </View>
               );

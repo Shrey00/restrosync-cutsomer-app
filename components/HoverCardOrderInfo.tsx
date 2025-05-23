@@ -20,7 +20,6 @@ const HoverCardOrderInfo = ({
       useNativeDriver: true,
     }).start();
   };
-
   const { theme } = useTheme();
   const styles = StyleSheet.create({
     mainContainer: {

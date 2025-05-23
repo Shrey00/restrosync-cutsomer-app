@@ -67,7 +67,6 @@ const OrderStatus = () => {
       }
       return stage;
     });
-    console.log(JSON.stringify(updatedStages, null, 2));
     setStages(updatedStages);
   }
   useEffect(() => {

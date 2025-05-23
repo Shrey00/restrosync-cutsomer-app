@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { CartItem, Coupon } from "@/types";
+import { CartItem, Coupon, FoodItemProps } from "@/types";
 type CartHoverInfo = {
   item: CartItem | null;
   itemCount: number;
@@ -11,9 +11,11 @@ type CartState = {
   coupons: Coupon[];
   appliedCoupon: Coupon | null | undefined;
   couponDiscountAmount: number;
+  selectedMenuItemData: FoodItemProps;
   setCartItem: (fullCartArr: CartItem[]) => void;
   setCoupons: (coupons: Coupon[]) => void;
   setAppliedCoupon: (coupon: Coupon | null) => void;
+  setSelectedMenuItemData: (data: FoodItemProps) => void;
   addToCart: (item: CartItem) => void;
   setCartHoverInfo: (item: CartItem | null, count: number) => void;
   removeFromCart: (id: string) => void;
@@ -30,6 +32,18 @@ type CartState = {
 const useCartStore = create<CartState>((set, get) => ({
   cart: [],
   coupons: [],
+  selectedMenuItemData: {
+    id: "",
+    name: "",
+    images: [],
+    rating: 0,
+    sellingPrice: 0,
+    markedPrice: 0,
+    discount: 0,
+    cuisineType: "",
+    variant: "",
+    restaurantId: "",
+  },
   appliedCoupon: null,
   couponDiscountAmount: 0,
   cartHoverInfo: {
@@ -134,16 +148,11 @@ const useCartStore = create<CartState>((set, get) => ({
       }));
     }
   },
-  // (set) => ({
-  // cart: [],
-
-  // updateQuantity: (id: string, change: number )=>
-  //   set((state)=>{
-  //     cart: [, ]
-  //     state.map(item =>
-  //       item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item
-  //     )
-  //   });
+  setSelectedMenuItemData: (data) =>
+    set((state) => ({
+      ...state,
+      selectedMenuItemData: data,
+    })),
 }));
 
 export default useCartStore;

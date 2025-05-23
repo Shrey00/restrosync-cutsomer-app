@@ -1,7 +1,7 @@
 import { Stack, router } from "expo-router";
 import { useState } from "react";
 import { Platform } from "react-native";
-import { Button, lightColors, createTheme, ThemeProvider } from "@rneui/themed";
+import { lightColors, createTheme, ThemeProvider } from "@rneui/themed";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
@@ -9,7 +9,7 @@ import { getValueFor, updateToken } from "@/utils";
 import useUserStore from "../store/userStore";
 import { api } from "@/constants/api";
 // To fix bug of navigating before the navigator is ready.
-import { useRootNavigationState, Redirect } from "expo-router";
+import { useRootNavigationState } from "expo-router";
 import "expo-dev-client";
 SplashScreen.preventAutoHideAsync();
 
@@ -151,6 +151,30 @@ export default function RootLayout() {
         <Stack.Screen
           name="profile-settings"
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="add-delivery-note-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="change-address-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="apply-coupon-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="add-address-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="add-to-cart-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="filters-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
         />
       </Stack>
     </ThemeProvider>

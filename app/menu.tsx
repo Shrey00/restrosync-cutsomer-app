@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Dimensions, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Badge, ListItem } from "@rneui/themed";
@@ -8,15 +8,9 @@ import Header from "@/components/Header";
 import FoodItemCard from "@/components/FoodItemCard";
 import useMenuStore from "../store/menuStore";
 import useUserStore from "../store/userStore";
-import { getViewProp } from "react-native-reanimated";
-import { getValueFor } from "@/utils";
-import AddToCartModal from "@/components/AddToCartModal";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Entypo from "@expo/vector-icons/Entypo";
-import FiltersModal from "@/components/FiltersModal";
-import ItemOptionsOverlay from "@/components/ItemOptionsOverlay";
-import { FoodItemProps } from "@/types";
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import HoverCardCartInfo from "@/components/HoverCardCartInfo";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
@@ -25,13 +19,12 @@ const { width } = Dimensions.get("window");
 const CARD_WIDTH = width - 20;
 export default function Menu() {
   const { theme } = useTheme();
+  const router = useRouter();
   const user = useUserStore((state) => state.user);
   const { name, restaurantId } = useLocalSearchParams();
   const setFilterModalOpen = useModalStore(
     (state) => state.setFiltersModalOpen
   );
-  const uri =
-    "https://thumbs.dreamstime.com/b/food-photography-epic-cheeseburger-flying-ingredients-splashing-dripping-sauce-dark-background-advertising-313260294.jpg";
   const styles = StyleSheet.create({
     skeletonContainer: {
       flexDirection: "column",
@@ -75,36 +68,38 @@ export default function Menu() {
       color: "#EFEFEF",
     },
   });
-  const { token } = useUserStore((state) => state.user);
+  // const { token } = useUserStore((state) => state.user);
   const menu = useMenuStore((state) => state.menu);
   const setMenu = useMenuStore((state) => state.setMenu);
   const appliedFilters = useMenuStore((state) => state.appliedFilters);
-  const addFilter = useMenuStore((state) => state.addFilter);
+  // const addFilter = useMenuStore((state) => state.addFilter);
   const removeFilter = useMenuStore((state) => state.removeFilter);
   const setCartHoverInfo = useCartStore((state) => state.setCartHoverInfo);
   const cart = useCartStore((state) => state.cart);
   const setCartItem = useCartStore((state) => state.setCartItem);
   const [loadingMenuItems, setLoadingMenuItems] = useState(true);
   const [categoryExpanded, setCategoryExpanded] = useState<boolean[]>([]);
-  // const [hoverCardVisble, setHoverCardVisble] = useState(false);
-  const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
-  const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+  const [hoverCardVisble, setHoverCardVisble] = useState(false);
+  // const hoverCardVisble = useRef(false);
+  // const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
+  // const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
+
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
-  const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
-    id: "",
-    name: "",
-    images: [],
-    rating: 0,
-    sellingPrice: 0,
-    markedPrice: 0,
-    discount: 0,
-    cuisineType: "",
-    variant: "",
-    restaurantId: "",
-  });
+  // const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
+  //   id: "",
+  //   name: "",
+  //   images: [],
+  //   rating: 0,
+  //   sellingPrice: 0,
+  //   markedPrice: 0,
+  //   discount: 0,
+  //   cuisineType: "",
+  //   variant: "",
+  //   restaurantId: "",
+  // });
   const generateMenuEndpoint = () => {
     var queryParameters: string = "";
     appliedFilters.forEach((item, index) => {
@@ -177,6 +172,7 @@ export default function Menu() {
         setCartItem(responseData.data);
         setCartHoverInfo(responseData.data[0], responseData.data.length);
         setHoverCardVisble(true);
+        // hoverCardVisble.current = true;
       }
     })();
   }, []);
@@ -185,17 +181,15 @@ export default function Menu() {
     if (cart.length === 0) {
       return;
     }
-    const currentOffset = event.nativeEvent.contentOffset.y + 20;
+    const currentOffset = event.nativeEvent.contentOffset.y + 250
     const contentHeight = event.nativeEvent.contentSize.height;
     const layoutHeight = event.nativeEvent.layoutMeasurement.height;
-    if (layoutHeight + currentOffset >= contentHeight) {
+    const offsetSumWithHeight = layoutHeight + currentOffset
+    if (offsetSumWithHeight >= contentHeight) {
       setHoverCardVisble(false); // Reached bottom
       return;
     }
-    if (currentOffset < prevOffset) {
-      setHoverCardVisble(true);
-    }
-    setPrevOffset(currentOffset);
+    setHoverCardVisble(true);
   };
   return (
     <SafeAreaView
@@ -226,7 +220,8 @@ export default function Menu() {
           />
           <Badge
             onPress={() => {
-              setFilterModalOpen(true);
+              router.push("/filters-modal");
+              // setFilterModalOpen(true);
             }}
             status="primary"
             value={
@@ -365,7 +360,6 @@ export default function Menu() {
                     description={menuItem.description}
                     variant={menuItem.variant}
                     user={user}
-                    setMenuItemData={() => setMenuItemData(menuItem)}
                   />
                 ))}
               </ListItem.Accordion>
@@ -390,16 +384,17 @@ export default function Menu() {
         </View>
       )}
 
-      <AddToCartModal menuItemData={menuItemData} />
+      {/* <AddToCartModal menuItemData={menuItemData} /> */}
       <HoverCardCartInfo
         isVisible={hoverCardVisble}
-        setIsVisible={setHoverCardVisble}
+      // setIsVisible={setHoverCardVisble}
       />
       <HoverCardOrderInfo
         isVisible={hoverOrderCardVisible}
         setIsVisible={setHoverOrderCardVisible}
       />
-      <FiltersModal />
+      {/* <FiltersModal /> */}
     </SafeAreaView>
+
   );
 }

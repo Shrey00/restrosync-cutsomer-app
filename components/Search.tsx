@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import { useEffect, useRef, createRef } from "react";
+import { View, StyleSheet, TextInput } from "react-native";
 import { Input } from "@rneui/themed";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useTheme } from "@rneui/themed";
@@ -14,8 +14,6 @@ const SearchBar = ({
   searchText?: string;
 }) => {
   const { theme } = useTheme();
-  const getCurrentOrders = useOrderStore((state) => state.getCurrentOrders);
-  const currentOrders = getCurrentOrders();
   const orders = useOrderStore((state) => state.orders);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
@@ -25,7 +23,7 @@ const SearchBar = ({
       width: "100%",
       margin: 0,
       paddingHorizontal: 0,
-      paddingBottom: 16,
+      paddingBottom: 0,
       paddingTop: 8,
     },
     inputInnerContainer: {
@@ -56,16 +54,17 @@ const SearchBar = ({
     },
   });
 
-  const inputRef = useRef(null);
+  // const inputRef = useRef(null);
+  const inputRef = createRef<TextInput>();
   const segments = useSegments(); // Detects route changes
   useEffect(() => {
     if (segments[1] === "search" && inputRef.current) {
       setHoverOrderCardVisible(false);
-      inputRef.current?.focus();
+      inputRef.current.focus();
     } else if (orders.length > 0) {
-      setHoverOrderCardVisible(true);
+      // setHoverOrderCardVisible(true);
     }
-  }, [segments, orders]);
+  }, [segments, inputRef]);
 
   const router = useRouter();
   const handleSearchBarFocus = () => {
