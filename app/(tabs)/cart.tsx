@@ -7,7 +7,7 @@ import { useTheme } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import OrderSuccessMessage from "@/components/OrderSuccessMessage";
-import { api } from "@/constants/api";
+import { api, softwareId } from "@/constants/api";
 import HoverCardOrderInfo from "@/components/HoverCardOrderInfo";
 import CartListItem from "@/components/CartListItem";
 import DeliveryInfoCard from "@/components/DeliveryInfoCard";
@@ -19,9 +19,20 @@ import { Link, useRouter } from "expo-router";
 import useModalStore from "@/store/modalsStore";
 import { AddressType } from "../../types";
 import { Redirect } from "expo-router";
+import { CartItem } from "@/types";
+// import { softwareId } from "@/constants/api";
+
 export default function CartsPage() {
   const { theme } = useTheme();
   const [loadingPlaceOrder, setLoadingPlaceOrder] = useState(false);
+  const [deliveryDetailLoading, setDeliveryDetailLoading] = useState(false);
+  const [deliveryDetails, setDeliveryDetails] = useState<{
+    distance: number,
+    unit: string,
+    deliveryAvailable: boolean,
+    deliveryAmount: number,
+    deliveryTime: number
+  } | null>(null)
   const modTheme = {
     colors: {
       primary: theme.colors.primary,
@@ -192,6 +203,7 @@ export default function CartsPage() {
     (state) => state.setHoverOrderInfo
   );
   const setOrders = useOrderStore((state) => state.setOrders);
+  // const cartItemsRef = useRef<CartItem[] | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -205,6 +217,10 @@ export default function CartsPage() {
         });
         const responseData = await response.json();
         setCartItem(responseData.data);
+        // console.log("HERE IT COMES BOI")
+        // cartItemsRef.current = responseData.data;
+        // console.log("CART ITEM REF");
+        // console.log(cartItemsRef.current)
         setCartItemsLoading(false);
       } catch (e) {
         console.log(e);
@@ -215,6 +231,7 @@ export default function CartsPage() {
   }, []);
   useEffect(() => {
     (async () => {
+      // if (!address.id) {
       const addressResponse = await fetch(`${api}/address/get-addresses`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -226,6 +243,7 @@ export default function CartsPage() {
         (item: AddressType, index: number) => {
           if (item.selected) {
             setAddress(item);
+            console.log("HEEY THAT WAS ONLY ONCE")
             selectedAddressDetail = item;
             setOrderButtonDisabled(false);
             setAllAddresses(addressResponseData.data);
@@ -233,9 +251,35 @@ export default function CartsPage() {
           }
         }
       );
+      // }
     })();
   }, []);
-
+  //@TODO - check reason for multiple execution of function under below useEffect
+  useEffect(() => {
+    (async () => {
+      if (boolAddressSelected) {
+        setDeliveryDetailLoading(true);
+        console.log(address)
+        const selectedLocation = { latitude: address?.location?.x, longitude: address?.location?.y };
+        console.log(selectedLocation)
+        try {
+          console.log("MAKING REQUEST RN")
+          const response = await fetch(
+            `${api}/restaurants/delivery/delivery-details?lat=${selectedLocation?.latitude}&lon=${selectedLocation?.longitude}&softwareId=${softwareId}`, {
+            headers: {
+              Authorization: `Bearer ${user.token}`
+            }
+          });
+          const responseData = await response.json();
+          setDeliveryDetails(responseData);
+        } catch (e) {
+          console.log(e);
+        } finally {
+          setDeliveryDetailLoading(false);
+        }
+      }
+    })();
+  }, [address]);
   const handleDeleteAllCartItems = async () => {
     const response = await fetch(`${api}/cart/delete-all`, {
       method: "DELETE",
@@ -289,18 +333,19 @@ export default function CartsPage() {
         const responseData = await response.json();
         if (responseData) {
           setOrderSuccessVisible(true);
-          await handleDeleteAllCartItems();
+          handleDeleteAllCartItems();
           fetchLatestOrders();
           setHoverOrderCardVisible(true);
-          setCartItem([]);
+          // setCartItem([]);
           setTimeout(() => {
             setOrderSuccessVisible(false);
           }, 1200);
         }
-        setLoadingPlaceOrder(false);
+        // setLoadingPlaceOrder(false);
       } catch (e) {
-        setLoadingPlaceOrder(false);
         console.log(e);
+      } finally {
+        setLoadingPlaceOrder(false);
       }
     } else {
       setChangeAddressModalOpen(true);
@@ -314,7 +359,7 @@ export default function CartsPage() {
     setAppliedCouponMessage(
       `Coupon applied!, saved ₹${totalAmount.discountAmount.toFixed(2)}!`
     );
-  }, [appliedCoupon]);
+  }, [appliedCoupon, cartItems]);
 
   if (!(user.token.length > 0)) {
     return <Redirect href={"/login"} />;
@@ -371,6 +416,8 @@ export default function CartsPage() {
                   <DeliveryInfoCard
                     boolAddressSelected={boolAddressSelected}
                     boolHasSavedAddresses={boolHasSavedAddresses}
+                    deliveryDetailLoading={deliveryDetailLoading}
+                    deliveryDetails={deliveryDetails}
                   />
                   <Card
                     containerStyle={{

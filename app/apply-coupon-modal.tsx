@@ -15,7 +15,6 @@ import { Coupon } from "@/types";
 import { api } from "@/constants/api";
 import { useRouter } from "expo-router";
 import useUserStore from "@/store/userStore";
-import useModalStore from "@/store/modalsStore";
 import { Skeleton } from "@rneui/base";
 import useCartStore from "@/store/cartStore";
 
@@ -173,7 +172,7 @@ const ApplyCouponModal = () => {
       (async () => {
         try {
           setAddressesLoading(true);
-          const response = await fetch(`${api}/restaurants/active-offers`, {
+          const response = await fetch(`${api}/restaurants/offers/active-offers`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -196,7 +195,7 @@ const ApplyCouponModal = () => {
     } else if (appliedCoupon && totalAmount.discountAmount > 0) {
       showToast("Coupon applied successfully");
     }
-  }, [appliedCoupon]);
+  }, []);
 
   return (
     <Modal transparent visible={isOpen} animationType="none">
@@ -242,85 +241,87 @@ const ApplyCouponModal = () => {
                 />
               </View>
             ) : (
-              activeCouponsList?.map((item: any, index) => {
-                return (
-                  <ListItem
-                    key={index}
-                    // onPress={() => {
-                    //   removeFilter({
-                    //     filter: "search",
-                    //     value: "any" as string,
-                    //   });
-                    //   addFilter([
-                    //     { filter: "search", value: item.itemName as string },
-                    //   ]);
-                    //   router.push(
-                    //     `/menu?name=${item.restaurantName}&search=${item.itemName}&restaurantId=${item.restaurantId}`
-                    //   );
-                    // }}
-                    style={styles.searchItem}
-                  >
-                    <ListItem.Content>
-                      <ListItem.Title style={{ fontSize: 14 }}>
-                        {item.couponCode}
-                      </ListItem.Title>
-                      <Text
-                        style={{
-                          fontFamily: "jakarta-sans-regular",
-                          fontSize: 11,
-                        }}
-                      >
-                        {item.discount}% Off upto ₹{item.maxDiscountAmount}{" "}
-                        {item.minOrderValue
-                          ? `on min order of ₹${item.minOrderValue}`
-                          : ""}
-                      </Text>
-                    </ListItem.Content>
-                    {appliedCoupon?.id === item.id ? (
-                      <Button
-                        title={"Remove"}
-                        type={"outline"}
-                        onPress={() => {
-                          handleRemoveCoupon(item);
-                        }}
-                        titleStyle={{
-                          fontSize: 12,
-                          color: theme.colors.primary,
-                        }}
-                        buttonStyle={{
-                          paddingHorizontal: 8,
-                          paddingVertical: 4,
-                          borderWidth: 0.8,
-                          borderRadius: 6,
-                        }}
-                        containerStyle={{ borderRadius: 6 }}
-                      />
-                    ) : (
-                      <Button
-                        title={`${
-                          appliedCoupon?.id === item.id ? "Applied" : "Apply"
-                        }`}
-                        type={"outline"}
-                        onPress={() => {
-                          handleApplyCoupon(item);
-                        }}
-                        titleStyle={{
-                          fontSize: 12,
-                          color: theme.colors.primary,
-                        }}
-                        buttonStyle={{
-                          paddingHorizontal: 8,
-                          paddingVertical: 4,
-                          borderWidth: 0.8,
-                          borderRadius: 6,
-                        }}
-                        disabled={appliedCoupon?.id === item.id}
-                        containerStyle={{ borderRadius: 6 }}
-                      />
-                    )}
-                  </ListItem>
-                );
-              })
+              activeCouponsList.length ?
+                activeCouponsList?.map((item: any, index) => {
+                  return (
+                    <ListItem
+                      key={index}
+                      // onPress={() => {
+                      //   removeFilter({
+                      //     filter: "search",
+                      //     value: "any" as string,
+                      //   });
+                      //   addFilter([
+                      //     { filter: "search", value: item.itemName as string },
+                      //   ]);
+                      //   router.push(
+                      //     `/menu?name=${item.restaurantName}&search=${item.itemName}&restaurantId=${item.restaurantId}`
+                      //   );
+                      // }}
+                      style={styles.searchItem}
+                    >
+                      <ListItem.Content>
+                        <ListItem.Title style={{ fontSize: 14 }}>
+                          {item.couponCode}
+                        </ListItem.Title>
+                        <Text
+                          style={{
+                            fontFamily: "jakarta-sans-regular",
+                            fontSize: 11,
+                          }}
+                        >
+                          {item.discount}% Off upto ₹{item.maxDiscountAmount}{" "}
+                          {item.minOrderValue
+                            ? `on min order of ₹${item.minOrderValue}`
+                            : ""}
+                        </Text>
+                      </ListItem.Content>
+                      {appliedCoupon?.id === item.id ? (
+                        <Button
+                          title={"Remove"}
+                          type={"outline"}
+                          onPress={() => {
+                            handleRemoveCoupon(item);
+                          }}
+                          titleStyle={{
+                            fontSize: 12,
+                            color: theme.colors.primary,
+                          }}
+                          buttonStyle={{
+                            paddingHorizontal: 8,
+                            paddingVertical: 4,
+                            borderWidth: 0.8,
+                            borderRadius: 6,
+                          }}
+                          containerStyle={{ borderRadius: 6 }}
+                        />
+                      ) : (
+                        <Button
+                          title={`${appliedCoupon?.id === item.id ? "Applied" : "Apply"
+                            }`}
+                          type={"outline"}
+                          onPress={() => {
+                            handleApplyCoupon(item);
+                          }}
+                          titleStyle={{
+                            fontSize: 12,
+                            color: theme.colors.primary,
+                          }}
+                          buttonStyle={{
+                            paddingHorizontal: 8,
+                            paddingVertical: 4,
+                            borderWidth: 0.8,
+                            borderRadius: 6,
+                          }}
+                          disabled={appliedCoupon?.id === item.id}
+                          containerStyle={{ borderRadius: 6 }}
+                        />
+                      )}
+                    </ListItem>
+                  );
+                }) : (<View style={{ flex: 1, justifyContent: 'center', alignItems: "center" }}>
+                  <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>No active offers available</Text>
+                </View>)
             )}
           </ScrollView>
         </Animated.View>

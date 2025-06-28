@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View, Dimensions, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Badge, ListItem } from "@rneui/themed";
@@ -83,23 +83,10 @@ export default function Menu() {
   // const hoverCardVisble = useRef(false);
   // const hoverCardVisble = useModalStore((state) => state.hoverCartInfo);
   // const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
-
   const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const setHoverOrderCardVisible = useModalStore(
     (state) => state.setHoverOrderInfo
   );
-  // const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
-  //   id: "",
-  //   name: "",
-  //   images: [],
-  //   rating: 0,
-  //   sellingPrice: 0,
-  //   markedPrice: 0,
-  //   discount: 0,
-  //   cuisineType: "",
-  //   variant: "",
-  //   restaurantId: "",
-  // });
   const generateMenuEndpoint = () => {
     var queryParameters: string = "";
     appliedFilters.forEach((item, index) => {
@@ -172,11 +159,10 @@ export default function Menu() {
         setCartItem(responseData.data);
         setCartHoverInfo(responseData.data[0], responseData.data.length);
         setHoverCardVisble(true);
-        // hoverCardVisble.current = true;
       }
     })();
   }, []);
-  const [prevOffset, setPrevOffset] = useState(0);
+  // const [prevOffset, setPrevOffset] = useState(0);
   const handleScrollCardView = (event: any) => {
     if (cart.length === 0) {
       return;

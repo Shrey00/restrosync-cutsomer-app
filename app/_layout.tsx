@@ -176,6 +176,10 @@ export default function RootLayout() {
           name="filters-modal"
           options={{ presentation: "transparentModal", headerShown: false }}
         />
+        <Stack.Screen
+          name="order-filters-modal"
+          options={{ presentation: "transparentModal", headerShown: false }}
+        />
       </Stack>
     </ThemeProvider>
   );

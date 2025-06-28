@@ -93,6 +93,7 @@ export default function FoodDetail() {
     },
     cartButton: {
       backgroundColor: theme.colors.primary,
+      height: 50,
       paddingVertical: 12,
     },
     cartButtonTitle: {
@@ -158,24 +159,26 @@ export default function FoodDetail() {
   // const hoverOrderCardVisible = useModalStore((state) => state.hoverOrderInfo);
   const [cartButtonText, setcartButtonText] = useState("Add");
   const [menuItemDataLoading, setMenuItemDataLoading] = useState(true);
-  const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
-    id: "",
-    name: "",
-    images: [],
-    rating: 0,
-    sellingPrice: 0,
-    markedPrice: 0,
-    discount: 0,
-    cuisineType: "",
-    variant: "",
-    restaurantId: "",
-  });
-  const getMenuItem = useMenuStore((state) => state.getMenuItem);
+  // const [menuItemData, setMenuItemData] = useState<FoodItemProps>({
+  //   id: "",
+  //   name: "",
+  //   images: [],
+  //   rating: 0,
+  //   sellingPrice: 0,
+  //   markedPrice: 0,
+  //   discount: 0,
+  //   cuisineType: "",
+  //   variant: "",
+  //   restaurantId: "",
+  // });
+  const setMenuItemData = useCartStore((state) => state.setSelectedMenuItemData);
+  const menuItemData = useCartStore((state) => state.selectedMenuItemData);
+  // const getMenuItem = useMenuStore((state) => state.getMenuItem);
   const addToCart = useCartStore((state) => state.addToCart);
   const setHoverCardVisble = useModalStore((state) => state.setHoverCartInfo);
-  const setCartModalIsOpen = useModalStore(
-    (state) => state.setAddToCartModalOpen
-  );
+  // const setCartModalIsOpen = useModalStore(
+  //   (state) => state.setAddToCartModalOpen
+  // );
   function checkExisting(
     menuItemId: string,
     addOns: { id: string; name: string; sellingPrice: number }[]
@@ -188,7 +191,7 @@ export default function FoodDetail() {
     return item && addOnsEquality;
   }
 
-  const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
+  // const [orderSuccessVisible, setOrderSuccessVisible] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -245,6 +248,9 @@ export default function FoodDetail() {
         if (exists) {
           handleUpdateQuantity(cartItem?.id!, cartItem?.quantity! + 1);
           setcartButtonText("Added 🎉");
+          setTimeout(() => {
+            setcartButtonText("Add");
+          }, 2000)
           setHoverCardVisble(true);
           setAddToCartLoading(false);
           return;
@@ -277,6 +283,9 @@ export default function FoodDetail() {
         addToCart(cartItemParams);
         setHoverCartInfo(cartItemParams, ++cartItems.length);
         setcartButtonText("Added 🎉");
+        setTimeout(() => {
+          setcartButtonText("Add");
+        }, 2000)
         setHoverCardVisble(true);
         setAddToCartLoading(false);
       } catch (e) {
@@ -413,23 +422,42 @@ export default function FoodDetail() {
           </View>
         )}
       </View>
-      <Button
-        icon={
-          <FontAwesome6
-            name="plus"
-            size={16}
-            color="#FDE4E8"
-            style={{ marginRight: 6 }}
+      {
+        menuItemDataLoading ?
+          <Skeleton
+            animation="pulse"
+            height={60}
+            style={styles.skeletonStructure}
+            skeletonStyle={{
+              ...styles.skeleton,
+              marginHorizontal: 10,
+              marginBottom: 130,
+              borderRadius: 6,
+              width: "95%",
+            }}
           />
-        }
-        loading={addToCartLoading}
-        title={cartButtonText}
-        titleStyle={styles.cartButtonTitle}
-        buttonStyle={styles.cartButton}
-        containerStyle={styles.cartButtonContainer}
-        onPress={handleAddToCart}
-      />
-      <AddToCartModal menuItemData={menuItemData} />
+          :
+          <Button
+            icon={
+              cartButtonText === "Add" && (
+                <FontAwesome6
+                  name="plus"
+                  size={16}
+                  color="#FDE4E8"
+                  style={{ marginRight: 6 }}
+                />
+              )
+            }
+            loading={addToCartLoading}
+            title={cartButtonText}
+            titleStyle={styles.cartButtonTitle}
+            buttonStyle={styles.cartButton}
+            containerStyle={styles.cartButtonContainer}
+            onPress={handleAddToCart}
+          />
+      }
+
+
     </SafeAreaView>
   );
 }

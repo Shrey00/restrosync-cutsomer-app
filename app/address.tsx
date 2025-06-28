@@ -119,7 +119,8 @@ const OrderStatus = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setOrders = useOrderStore((state) => state.setOrders);
-  const orders = useOrderStore((state) => state.orders);
+  const
+    orders = useOrderStore((state) => state.orders);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
 
@@ -241,7 +242,6 @@ const OrderStatus = () => {
       backgroundColor: "#EDEDED",
     },
   });
-  const cuisineType = "veg";
   useEffect(() => {
     (async () => {
       const response = await fetch(`${api}/orders/my-orders`, {
@@ -281,9 +281,9 @@ const OrderStatus = () => {
       <ScrollView
         contentContainerStyle={{ paddingBottom: 12, marginHorizontal: 10 }}
       >
-        <View style={{ marginTop: 12 }}>
+        <View style={{ marginTop: 12, marginBottom: 12 }}>
           {allAddresses.length > 0 && (
-            <Text style={{ fontFamily: "jakarta-sans-semibold", fontSize: 16 }}>
+            <Text style={{ fontFamily: "jakarta-sans-semibold", fontSize: 16, paddingBottom: 3 }}>
               Saved Addresses
             </Text>
           )}

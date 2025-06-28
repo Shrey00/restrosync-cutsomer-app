@@ -21,7 +21,7 @@ import useCartStore from "@/store/cartStore";
 import useModalStore from "@/store/modalsStore";
 import { checkArrayValueEquality } from "../utils";
 const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
-  const isOpen = useModalStore((state) => state.addToCartModalOpen);
+  const isOpen = true;
   const setIsOpen = useModalStore((state) => state.setAddToCartModalOpen);
   const slideAnim = useRef(new Animated.Value(600)).current; // Initial position of modal (offscreen)
   const [activeIndex, setActiveIndex] = useState(0);
@@ -155,6 +155,8 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
       (async () => {
         try {
           setVariantsDataLoading(true);
+          console.log("JUST BEFORE THE REQUEST")
+          console.log(menuItemData.id)
           const response = await fetch(`${api}/menu/item/variants`, {
             method: "POST",
             headers: {
@@ -164,6 +166,7 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
             body: JSON.stringify({ menuItemId: menuItemData.id }),
           });
           const responseData = await response.json();
+          console.log("IS THE", responseData)
           const addOnsData = responseData.data.filter((item: any) => {
             return item.variant === "add-on";
           });
@@ -213,7 +216,6 @@ const AddToCartModal = ({ menuItemData }: { menuItemData: FoodItemProps }) => {
         });
       }
     });
-    console.log(JSON.stringify(addOnCheckedIndex, null, 2));
     return arr;
   }
   function getTotalPrice(addOnsData: any[]) {

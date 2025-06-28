@@ -16,8 +16,6 @@ const OrderStatus = () => {
   const { orderId } = useLocalSearchParams();
   const getOrder = useOrderStore((state) => state.getOrder);
   const orderDetail = getOrder(orderId as string);
-  console.log(orderDetail);
-  // const [orderStatus, setOrderStatus] = useState("");
   const [stages, setStages] = useState([
     { id: 1, name: "Order Confirmed", icon: "check-circle", reached: false },
     { id: 2, name: "Preparing", icon: "utensils", reached: false },
@@ -263,6 +261,20 @@ const OrderStatus = () => {
               </View>
             );
           })}
+          {
+            orderDetail?.discount ?
+              <View
+                style={styles.flexRowContainer}
+              >
+                <Text style={styles.fontStyles}>
+                  Discount
+                </Text>
+                <Text style={{ ...styles.fontStyles, color: theme.colors.success }}>
+                  -₹{orderDetail.discount}
+                </Text>
+              </View> :
+              null
+          }
         </View>
         <View style={styles.flexRowContainer}>
           <Text style={styles.fontStyles}>Grand Total</Text>

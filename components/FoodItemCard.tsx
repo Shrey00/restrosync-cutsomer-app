@@ -110,6 +110,9 @@ export default function FoodItemCard({
         if (exists) {
           handleUpdateQuantity(cartItem?.id!, cartItem?.quantity! + 1);
           setcartButtonText("Added 🎉");
+          setTimeout(() => {
+            setcartButtonText("Add");
+          }, 2000)
           setHoverCardVisble(true);
           setAddToCartLoading(false);
           return;

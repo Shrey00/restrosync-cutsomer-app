@@ -1,4 +1,4 @@
-import { useEffect, useRef, createRef } from "react";
+import { useEffect, createRef } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { Input } from "@rneui/themed";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -46,7 +46,6 @@ const SearchBar = ({
     },
     inputErrorStyle: {
       margin: 0,
-      // fontSize: 0,
     },
     icon: {
       position: "absolute",
@@ -54,7 +53,6 @@ const SearchBar = ({
     },
   });
 
-  // const inputRef = useRef(null);
   const inputRef = createRef<TextInput>();
   const segments = useSegments(); // Detects route changes
   useEffect(() => {

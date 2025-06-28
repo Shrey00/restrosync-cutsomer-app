@@ -43,19 +43,26 @@ type Order = {
   totalAmount: number;
   deliveryStatus: string;
   restaurantName: string;
+  discount: number;
   createdAt: string | Date;
   orderItems: OrderItem[];
 };
 type Orders = Order[];
+type Filter = { filter: string; value: string };
+
 type OrdersState = {
   newOrderDetails: NewOrderDetails;
   orders: Orders;
   currentOrders: [];
+  appliedFilters: Filter[];
   deliveryNote: string;
   //   deliveryNoteModalOpen: boolean;
   //   couponsModalOpen: boolean;
   //   confirmLogoutModalOpen: boolean;
   //   paymentOptionsModal: boolean;
+  addFilter: (filters: Filter[]) => void;
+  removeFilter: (filter: Filter) => void;
+  clearAllFilters: () => void;
   setNewOrderDetails: (newOrderDetails: Partial<NewOrderDetails>) => void;
   setOrders: (orders: Orders) => void;
   getOrder: (orderId: string) => Order | undefined;
@@ -78,6 +85,24 @@ const useOrderStore = create<OrdersState>((set, get) => ({
   currentOrders: [],
   deliveryNote: "",
   orders: [],
+  appliedFilters: [],
+  addFilter: (filters) =>
+    set((state) => ({
+      ...state,
+      appliedFilters: [...filters],
+    })),
+  removeFilter: (filter) =>
+    set((state) => ({
+      ...state,
+      appliedFilters: state.appliedFilters.filter(
+        (appliedFilter) => appliedFilter.filter !== filter.filter
+      ),
+    })),
+  clearAllFilters: () =>
+    set((state) => ({
+      ...state,
+      appliedFilters: [],
+    })),
   setNewOrderDetails: (orderDetail) => {
     set((state) => {
       return {

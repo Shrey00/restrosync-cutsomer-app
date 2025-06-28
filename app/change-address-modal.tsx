@@ -328,7 +328,7 @@ const ChangeAddressModal = () => {
                 </View>
               </Card>
             </Pressable>
-            <View style={{ marginTop: 12 }}>
+            <View style={{ marginTop: 12, marginBottom: 12 }}>
               {allAddresses.length > 0 && (
                 <Text style={{ fontFamily: "jakarta-sans-semibold" }}>
                   Saved Addresses

@@ -78,7 +78,7 @@ const CartListItem = ({
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      width: 82,
+      width: 84,
       borderColor: theme.colors.primary,
       backgroundColor: theme.colors.secondary,
       borderRadius: 4,
@@ -99,7 +99,7 @@ const CartListItem = ({
       color: modTheme.colors.success,
     },
     quantityText: {
-      fontSize: 12,
+      fontSize: 14,
     },
     quantityButtonMinus: {
       width: 26,
@@ -185,7 +185,7 @@ const CartListItem = ({
                 icon={
                   <FontAwesome6
                     name="minus"
-                    size={12}
+                    size={14}
                     color={theme.colors.primary}
                   />
                 }
@@ -199,7 +199,7 @@ const CartListItem = ({
                 icon={
                   <FontAwesome6
                     name="plus"
-                    size={12}
+                    size={14}
                     color={theme.colors.primary}
                   />
                 }
@@ -207,10 +207,10 @@ const CartListItem = ({
                 buttonStyle={styles.quantityButtonPlus}
               />
             </View>
-            <Pressable onPress={() => handleDeleteCartItem(id)}>
+            <Pressable onPress={() => handleDeleteCartItem(id)} style={{ padding: 5 }}>
               <FontAwesome6
                 name="trash-alt"
-                size={16}
+                size={18}
                 color={theme.colors.primary}
               />
             </Pressable>

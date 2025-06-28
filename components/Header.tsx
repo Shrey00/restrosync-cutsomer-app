@@ -134,16 +134,7 @@ const Header = ({
     })();
   }, [setLocation, setLocationText]);
 
-  // let text = "Waiting..";
-  // if (locationAccessDenied) {
-  //   text = locationAccessDenied;
-  // } else if (location) {
-  //   text = JSON.stringify(location);
-  //   console.log(text);
-  // }
-
   function handleLocationSetting() {
-    // setAddAddressModalOpen(true);
     router.push("/add-address-modal");
   }
 

@@ -13,20 +13,30 @@ import useOrderStore from "@/store/orderStore";
 import useUserStore from "@/store/userStore";
 import useLocationStore from "@/store/locationStore";
 import { useRouter } from "expo-router";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../constants/api";
+import useCartStore from "@/store/cartStore";
+import { Skeleton } from "@rneui/base";
 const DeliveryInfoCard = ({
   boolAddressSelected,
   boolHasSavedAddresses,
+  deliveryDetailLoading,
+  deliveryDetails
 }: {
   boolAddressSelected: boolean;
   boolHasSavedAddresses: boolean;
+  deliveryDetailLoading: boolean,
+  deliveryDetails: {
+    distance: number,
+    unit: string,
+    deliveryAvailable: boolean,
+    deliveryAmount: number,
+    deliveryTime: number
+  } | null
 }) => {
   const { theme } = useTheme();
-  const setChangeAddressModalOpen = useModalStore(
-    (state) => state.setChangeAddressModalOpen
-  );
-  const location = useLocationStore((state) => state.location);
+  // const cartItems = useCartStore((state) => state.cart)
+  // const location = useLocationStore((state) => state.location);
   const router = useRouter();
   // const location = useLocationStore((state) => state.location);
   const styles = StyleSheet.create({
@@ -48,6 +58,20 @@ const DeliveryInfoCard = ({
       paddingVertical: 4,
       borderColor: theme.colors.grey5,
     },
+    skeletonContainer: {
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 6,
+      marginTop: 10,
+    },
+    skeletonStructure: {
+      backgroundColor: "#FFFFF",
+      borderRadius: 8,
+    },
+    skeleton: {
+      backgroundColor: "#EDEDED",
+    },
   });
 
   function handleChangeAddressButton() {
@@ -58,34 +82,37 @@ const DeliveryInfoCard = ({
   const address = useAddressStore((state) => state.address);
   const deliveryNote = useOrderStore((state) => state.deliveryNote);
   const setDeliveryNote = useOrderStore((state) => state.setDeliveryNote);
-  // const setAddNoteModalOpen = useModalStore(
-  //   (state) => state.setAddNoteModalOpen
-  // );
   function handleAddNote() {
     if (deliveryNote.length) setDeliveryNote("");
     else router.push("/add-delivery-note-modal");
     // setAddNoteModalOpen(true);
   }
-  // useEffect(() => {
-  //   (async () => {
-  //     const response = await fetch(
-  //       `${api}/orders/delivery-details?lat1=${location?.coords.latitude}&lon1=${location?.coords.longitude}`
-  //     );
 
-  //   })();
-  // }, []);
   return (
     <Card containerStyle={styles.cardContainer}>
       {/* delivery-time-row */}
       <View style={{ ...styles.deliveryCardRow, alignItems: "center" }}>
         <Octicons name="stopwatch" size={18} color={theme.colors.primary} />
         <View style={{ flexDirection: "row" }}>
-          <Text style={{ fontFamily: "jakarta-sans-regular", fontSize: 14 }}>
-            Delivery in{" "}
-          </Text>
-          <Text style={{ fontFamily: "jakarta-sans-semibold", fontSize: 14 }}>
-            {boolAddressSelected && "-- min"}
-          </Text>
+          {
+            deliveryDetailLoading ?
+              <Skeleton
+                animation="pulse"
+                height={40}
+                style={styles.skeletonStructure}
+                skeletonStyle={styles.skeleton}
+              /> :
+              deliveryDetails?.deliveryAvailable ?
+
+                <Text style={{ fontFamily: "jakarta-sans-regular", fontSize: 14 }}>
+                  Delivery in{" "}
+                  {boolAddressSelected
+                    ? deliveryDetails?.deliveryTime + " " + "mins (approx.)" : "-- min"}
+                </Text> :
+                <Text style={{ fontFamily: "jakarta-sans-regular", fontSize: 14, color: theme.colors.error }}>
+                  Delivery is unavailable for selected location
+                </Text>
+          }
         </View>
       </View>
       {/* delivery-address-row */}

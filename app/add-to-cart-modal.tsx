@@ -211,7 +211,6 @@ const AddToCartModal = () => {
         });
       }
     });
-    console.log(JSON.stringify(addOnCheckedIndex, null, 2));
     return arr;
   }
   function getTotalPrice(addOnsData: any[]) {
@@ -265,7 +264,6 @@ const AddToCartModal = () => {
         setcartButtonText("Added 🎉");
         setHoverCardVisble(true);
         setTimeout(() => {
-          //   setIsOpen(false);
           router.back();
         }, 1000);
         setAddToCartLoading(false);

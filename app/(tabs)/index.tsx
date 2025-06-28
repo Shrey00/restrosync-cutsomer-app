@@ -78,7 +78,7 @@ export default function Index() {
       <Header user={user} showSearch={true} />
       <View
         id="carousel-component"
-        // dataSet={{ kind: "basic-layouts", name: "left-align" }}
+      // dataSet={{ kind: "basic-layouts", name: "left-align" }}
       ></View>
       <SlideLinkCardSection
         heading="Restaurants"
