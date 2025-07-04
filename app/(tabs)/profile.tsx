@@ -162,7 +162,7 @@ export default function Profile() {
                 </ListItem.Content>
               </ListItem>
             </Pressable>
-            <Pressable onPress={() => router.push("/orders")}>
+            <Pressable>
               <ListItem containerStyle={styles.listItem}>
                 <Entypo
                   name="star-outlined"

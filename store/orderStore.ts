@@ -56,22 +56,15 @@ type OrdersState = {
   currentOrders: [];
   appliedFilters: Filter[];
   deliveryNote: string;
-  //   deliveryNoteModalOpen: boolean;
-  //   couponsModalOpen: boolean;
-  //   confirmLogoutModalOpen: boolean;
-  //   paymentOptionsModal: boolean;
   addFilter: (filters: Filter[]) => void;
   removeFilter: (filter: Filter) => void;
   clearAllFilters: () => void;
   setNewOrderDetails: (newOrderDetails: Partial<NewOrderDetails>) => void;
   setOrders: (orders: Orders) => void;
+  removeOrderItem: (orderId: string) => void;
   getOrder: (orderId: string) => Order | undefined;
   getCurrentOrders: () => Orders;
   setDeliveryNote: (note: string) => void;
-  // setDeliveryNoteModalOpen: (open: boolean) => void;
-  //   setCouponsModalOpen: (open: boolean) => void;
-  //   setConfirmLogoutModalOpen: (open: boolean) => void;
-  //   setPaymentOptionsModal: (open: boolean) => void;
 };
 const useOrderStore = create<OrdersState>((set, get) => ({
   newOrderDetails: {
@@ -122,6 +115,16 @@ const useOrderStore = create<OrdersState>((set, get) => ({
       };
     });
   },
+
+  removeOrderItem: (orderId) => {
+    set((state) => {
+      return {
+        ...state,
+        orders: state.orders.filter((order) => order.orderId !== orderId),
+      };
+    });
+  },
+
   setDeliveryNote: (note) => {
     set((state) => {
       return {

@@ -20,7 +20,7 @@ const OrdersFiltersModal = () => {
     const lastDateFilter = [
         {
             filter: "1m",
-            value: "1 Months",
+            value: "30 Days",
         },
         {
             filter: "3m",

@@ -1,31 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   StyleSheet,
   View,
-  Dimensions,
-  ScrollView,
   Text,
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme, Avatar, Card, ListItem, Dialog } from "@rneui/themed";
+import { useTheme, Card, Dialog } from "@rneui/themed";
 import { Button } from "@rneui/themed";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
-import Feather from "@expo/vector-icons/Feather";
-import { restaurantId } from "@/constants/restaurantInfo";
 import { api } from "@/constants/api";
-import { Skeleton } from "@rneui/themed";
-import Header from "@/components/Header";
-import FoodItemCard from "@/components/FoodItemCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import CustomInput from "@/components/ui/CustomInput";
-import useMenuStore from "../store/menuStore";
 import useUserStore from "../store/userStore";
-import { FoodItemProps } from "@/types";
 import { useRouter } from "expo-router";
-export default function profile() {
+export default function Profile() {
   const { theme } = useTheme();
   const user = useUserStore((state) => state.user);
   const router = useRouter();
@@ -230,18 +220,16 @@ export default function profile() {
               fontSize: 14,
             }}
           >
-            This will delete your account and all the data associated with the
-            account. If you don't want that, you can logout, and you'll be able
-            to come back any time.
+            Deleting your account will permanently erase all your data. To keep your account, just log out—you can return anytime.
           </Text>
-          <View style={{ flexDirection: "row", marginTop: 12 }}>
-            <Button
-              title={"Delete Account"}
-              buttonStyle={{ backgroundColor: "#BD2024" }}
-              containerStyle={{ width: 150 }}
-              onPress={() => setShowDeletionConfirmModal(true)}
-            />
-          </View>
+          {/* <View style={{ flexDirection: "row", marginTop: 12 }}> */}
+          <Button
+            title={"Delete Account"}
+            buttonStyle={{ backgroundColor: "#BD2024" }}
+            containerStyle={{ width: 150 }}
+            onPress={() => setShowDeletionConfirmModal(true)}
+          />
+          {/* </View> */}
         </Card>
       </View>
       <Dialog

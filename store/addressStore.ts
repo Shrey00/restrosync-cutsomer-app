@@ -4,6 +4,7 @@ type AddressState = {
   address: AddressType;
   allAddresses: AddressType[];
   setAddress: (address: AddressType) => void;
+  removeAddressItem: (addressId: string) => void;
   setAllAddresses: (address: AddressType[]) => void;
 };
 const useAddressStore = create<AddressState>((set, get) => ({
@@ -27,6 +28,16 @@ const useAddressStore = create<AddressState>((set, get) => ({
         address: address,
       };
     }),
+  removeAddressItem: (addressId) => {
+    set((state) => {
+      return {
+        ...state,
+        orders: state.allAddresses.filter(
+          (address) => address.id !== addressId
+        ),
+      };
+    });
+  },
   setAllAddresses: (address) =>
     set((state) => {
       return {

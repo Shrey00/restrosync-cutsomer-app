@@ -14,7 +14,7 @@ import { api } from "../constants/api";
 import useOrderStore from "@/store/orderStore";
 import { AddressType } from "@/types";
 import { ScrollView } from "react-native";
-
+import AddressItemDropdown from "@/components/AddressItemDropdown";
 const AddressList = ({
   allAddresses,
 }: {
@@ -22,6 +22,7 @@ const AddressList = ({
 }) => {
   const { theme } = useTheme();
   const { token } = useUserStore((state) => state.user);
+  const [dropdownVisible, setDropdownVisible] = useState(-1);
   const styles = StyleSheet.create({
     addressText: {
       fontFamily: "jakarta-sans-medium",
@@ -85,6 +86,8 @@ const AddressList = ({
                 {"  "}
                 {item.type}
               </Text>
+              <AddressItemDropdown id={item.id!} visible={dropdownVisible === index && dropdownVisible !== -1} setVisible={setDropdownVisible} index={index} />
+
               {/* <Button
                 disabled={address.id === item.id ? true : false}
                 title={address.id === item.id ? "selected" : "select"}
@@ -113,14 +116,12 @@ const AddressList = ({
     </ScrollView>
   );
 };
-const OrderStatus = () => {
+const Address = () => {
   const { theme } = useTheme();
   const allAddresses = useAddressStore((state) => state.allAddresses);
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setOrders = useOrderStore((state) => state.setOrders);
-  const
-    orders = useOrderStore((state) => state.orders);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const setAllAddresses = useAddressStore((state) => state.setAllAddresses);
 
@@ -134,6 +135,7 @@ const OrderStatus = () => {
           },
         });
         const responseData = await response.json();
+        console.log(JSON.stringify(responseData, null, 2))
         setAllAddresses(responseData.data);
         setAddressesLoading(false);
       } catch (e) {
@@ -200,11 +202,9 @@ const OrderStatus = () => {
     optionsContainer: {
       flexDirection: "column",
     },
-    //button
     cartButton: {
       backgroundColor: theme.colors.primary,
       paddingVertical: 12,
-      // marginVertical: 8,
     },
     cartButtonTitle: {
       fontSize: 16,
@@ -317,4 +317,4 @@ const OrderStatus = () => {
   );
 };
 
-export default OrderStatus;
+export default Address;

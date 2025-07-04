@@ -27,6 +27,7 @@ const Orders = () => {
   const addFilter = useOrderStore((state) => state.addFilter);
   const inputRef = createRef<TextInput>();
   const [searchText, setSearchText] = useState("");
+  const [dropdownVisible, setDropdownVisible] = useState(-1);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const styles = StyleSheet.create({
     card: {
@@ -40,6 +41,7 @@ const Orders = () => {
       shadowOpacity: 0.1,
       shadowRadius: 10,
       elevation: 1,
+      zIndex: 8
     },
     container: {
       flex: 1,
@@ -210,15 +212,11 @@ const Orders = () => {
     }
     const delayDebounceFn = setTimeout(() => {
       (async () => {
-        console.log("HERE IT CAME BODDY")
-        // if (searchText.trim()) {
         try {
           setOrdersLoading(true);
           const endpoint = generateOrdersEndpoint(searchText);
-          console.log(endpoint)
           const result = await fetchResults(endpoint);
-          console.log(result)
-          // setOrders(result);
+          setOrders(result);
         } catch (e) {
           console.log(e);
         } finally {
@@ -254,7 +252,101 @@ const Orders = () => {
           Profile
         </Text>
       </Pressable>
+      <View>
+        <View style={{ marginHorizontal: 10 }}>
+          <Input
+            ref={inputRef}
+            placeholder="Search..."
+            value={searchText}
+            onChangeText={setSearchText}
+            rightIcon={
+              <AntDesign
+                name="search1"
+                size={24}
+                style={{ color: theme.colors.primary }}
+              />
+            }
+            containerStyle={searchBarStyles.inputOuterContainer}
+            inputContainerStyle={searchBarStyles.inputInnerContainer}
+            inputStyle={searchBarStyles.input}
+            errorStyle={searchBarStyles.inputErrorStyle}
+          />
+        </View>
+        <ScrollView
+          contentContainerStyle={{
+            flexDirection: "row",
+            gap: 6,
+            height: 36,
+            maxHeight: 36,
+            marginBottom: 10,
+            paddingHorizontal: 10,
+            marginHorizontal: 0,
+          }}
+          horizontal={true}
+        >
+          <Badge
+            onPress={() => {
+              router.push("/order-filters-modal");
+            }}
+            status="primary"
+            value={
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <AntDesign name="filter" size={18} color="black" />
+                <Text>Filters</Text>
+              </View>
+            }
+            badgeStyle={{
+              ...styles.badgeStyle,
+              ...styles.generalBadgeStyle,
+            }}
+            textStyle={{
+              ...styles.badgeTextStyle,
+              color: theme.colors.grey0,
+            }}
+          />
 
+          {appliedFilters.map((item, index) => {
+            return (
+              <Badge
+                key={index}
+                status="primary"
+                onPress={() => removeFilter(item)}
+                value={
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Text
+                      style={
+                        item.filter === "veg"
+                          ? [styles.badgeTextStyle, styles.greenColor]
+                          : null
+                      }
+                    >
+                      {item.value}
+                    </Text>
+                    <AntDesign
+                      name="close"
+                      size={16}
+                      color="black"
+                      style={{ marginTop: 2 }}
+                    />
+                  </View>
+                }
+                badgeStyle={
+                  item.filter === "veg"
+                    ? [styles.badgeStyle, styles.greenBadgeStyle]
+                    : [styles.badgeStyle, styles.generalBadgeStyle]
+                }
+              />
+            );
+          })}
+        </ScrollView>
+      </View>
       {
         ordersLoading ?
           <ScrollView contentContainerStyle={{ marginHorizontal: 10 }}>
@@ -302,101 +394,6 @@ const Orders = () => {
             />
           </ScrollView> :
           <View style={{ flex: 1 }}>
-            <View>
-              <View style={{ marginHorizontal: 10 }}>
-                <Input
-                  ref={inputRef}
-                  placeholder="Search..."
-                  value={searchText}
-                  onChangeText={setSearchText}
-                  rightIcon={
-                    <AntDesign
-                      name="search1"
-                      size={24}
-                      style={{ color: theme.colors.primary }}
-                    />
-                  }
-                  containerStyle={searchBarStyles.inputOuterContainer}
-                  inputContainerStyle={searchBarStyles.inputInnerContainer}
-                  inputStyle={searchBarStyles.input}
-                  errorStyle={searchBarStyles.inputErrorStyle}
-                />
-              </View>
-              <ScrollView
-                contentContainerStyle={{
-                  flexDirection: "row",
-                  gap: 6,
-                  height: 36,
-                  maxHeight: 36,
-                  marginBottom: 10,
-                  paddingHorizontal: 10,
-                  marginHorizontal: 0,
-                }}
-                horizontal={true}
-              >
-                <Badge
-                  onPress={() => {
-                    router.push("/order-filters-modal");
-                  }}
-                  status="primary"
-                  value={
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <AntDesign name="filter" size={18} color="black" />
-                      <Text>Filters</Text>
-                    </View>
-                  }
-                  badgeStyle={{
-                    ...styles.badgeStyle,
-                    ...styles.generalBadgeStyle,
-                  }}
-                  textStyle={{
-                    ...styles.badgeTextStyle,
-                    color: theme.colors.grey0,
-                  }}
-                />
-
-                {appliedFilters.map((item, index) => {
-                  return (
-                    <Badge
-                      key={index}
-                      status="primary"
-                      onPress={() => removeFilter(item)}
-                      value={
-                        <View
-                          key={index}
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            gap: 2,
-                          }}
-                        >
-                          <Text
-                            style={
-                              item.filter === "veg"
-                                ? [styles.badgeTextStyle, styles.greenColor]
-                                : null
-                            }
-                          >
-                            {item.value}
-                          </Text>
-                          <AntDesign
-                            name="close"
-                            size={16}
-                            color="black"
-                            style={{ marginTop: 2 }}
-                          />
-                        </View>
-                      }
-                      badgeStyle={
-                        item.filter === "veg"
-                          ? [styles.badgeStyle, styles.greenBadgeStyle]
-                          : [styles.badgeStyle, styles.generalBadgeStyle]
-                      }
-                    />
-                  );
-                })}
-              </ScrollView>
-            </View>
             {orders.length > 0 ? (
               <ScrollView contentContainerStyle={{ paddingBottom: 12 }}>
                 {orders?.map((order, orderIndex) => {
@@ -423,7 +420,7 @@ const Orders = () => {
                           >
                             {order.restaurantName}
                           </Text>
-                          <OrderItemDropdown id={order.orderId} />
+                          <OrderItemDropdown id={order.orderId} visible={dropdownVisible === orderIndex && dropdownVisible !== -1} setVisible={setDropdownVisible} index={orderIndex} />
                         </View>
                         <View style={styles.orderItemsContainerBorder}>
                           <Text
@@ -489,19 +486,28 @@ const Orders = () => {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
-                  Haven't ordered yet!{" "}
-                  <Link
-                    style={{
-                      color: theme.colors.primary,
-                      textDecorationLine: "underline",
-                      textDecorationStyle: "solid",
-                    }}
-                    href="/"
-                  >
-                    Let's order
-                  </Link>
-                </Text>
+                {
+                  searchText.trim().length > 0 ?
+                    <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
+                      No item found!{" "}
+                    </Text>
+                    :
+                    <Text style={{ fontFamily: "jarkarta-sans-medium", fontSize: 16 }}>
+                      Haven't ordered yet!{" "}
+                      <Link
+                        style={{
+                          color: theme.colors.primary,
+                          textDecorationLine: "underline",
+                          textDecorationStyle: "solid",
+                        }}
+                        href="/"
+                      >
+                        Let's order
+                      </Link>
+                    </Text>
+
+                }
+
               </View>
             )}
           </View>
